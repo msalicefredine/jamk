@@ -12,10 +12,6 @@ DROP SEQUENCE employee_sequence;
 DROP SEQUENCE stay_sequence;
 DROP SEQUENCE reservation_sequence;
 
-DROP TRIGGER employee_trigger;
-DROP TRIGGER stay_trigger;
-DROP TRIGGER reservation_trigger;
-
 CREATE TABLE Employee
 	(eid INTEGER,
 	salary INTEGER,
