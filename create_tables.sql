@@ -1,4 +1,3 @@
-DROP TABLE Occupies;
 DROP TABLE Discounts;
 DROP TABLE Reservation;
 DROP TABLE Room;
@@ -19,7 +18,7 @@ CREATE TABLE Employee
 	PRIMARY KEY (eid));
 
 CREATE SEQUENCE employee_sequence
-START WITH 1
+START WITH 500
 INCREMENT BY 1;
 
 CREATE OR REPLACE TRIGGER employee_trigger
@@ -62,14 +61,14 @@ CREATE TABLE Stay
 	checkoutDate DATE,
 	checkinTime VARCHAR(8),
 	checkoutTime VARCHAR(8),
-	checkinEid INTEGER,
+	checkinEid INTEGER NOT NULL,
 	checkoutEid INTEGER,
 	PRIMARY KEY (stayId),
 	FOREIGN KEY (checkinEid) REFERENCES Employee (eid),
 	FOREIGN KEY (checkoutEid) REFERENCES Employee (eid));
 
 CREATE SEQUENCE stay_sequence
-START WITH 1
+START WITH 500
 INCREMENT BY 1;
 
 CREATE OR REPLACE TRIGGER stay_trigger
@@ -105,7 +104,7 @@ CREATE TABLE Reservation
 		ON DELETE CASCADE);
 
 CREATE SEQUENCE reservation_sequence
-START WITH 1
+START WITH 500
 INCREMENT BY 1;
 
 CREATE OR REPLACE TRIGGER reservation_trigger
@@ -129,16 +128,5 @@ REFERENCES Employee
 ON DELETE CASCADE,
 	FOREIGN KEY (stayId)
 REFERENCES Stay
-ON DELETE CASCADE);
-
-CREATE TABLE Occupies
-(stayId INTEGER,
-rNum INTEGER,
-PRIMARY KEY (stayId,rNum),
-FOREIGN KEY (stayId)
-REFERENCES Stay
-ON DELETE CASCADE,
-FOREIGN KEY (rNum)
-REFERENCES Room
 ON DELETE CASCADE);
 
