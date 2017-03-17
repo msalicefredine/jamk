@@ -25,7 +25,6 @@
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <script src="main.js"></script>
     <![endif]-->
 
 </head>
@@ -153,27 +152,34 @@
                         <form>
                             <div class="input-group">
                                 <span class="input-group-addon">Authorization Code</span>
-                                <input id="auth" type="text" class="form-control" name="auth">
+                                <input id="managerAuth" type="text" class="form-control" name="auth">
                             </div>
                             <hr>
                             <h3>Delete Room Type</h3>
-                            <label data-toggle="tooltip" title="CTRL-click to select more than one" for="sel2">Delete all rooms of a given room type from system</label>
-                            <select multiple="" class="form-control" id="sel2">
-                                <option>Junior Room</option>
-                                <option>Deluxe Room</option>
-                                <option>Queen Suite</option>
-                                <option>Premium Suite</option>
+                            <ol class="breadcrumb">
+                                <li class="active">
+                                    TODO - words
+                                </li>
+                            </ol>
+                            <select class="form-control" id="roomTypeValue">
+                                <option value="junior">Junior Room</option>
+                                <option value="deluxe">Deluxe Room</option>
+                                <option value="queen">Queen Suite</option>
+                                <option value="premium">Premium Suite</option>
                             </select>
                             <br>
                             <hr>
                             <div class="form-group" align="right">
-                                <button type="submit" class="btn btn-primary btn-block">Delete</button>
+                                <button type="button" id="manageRoomsSubmit" class="btn btn-primary btn-block">Delete</button>
                             </div>
                         </form>
                     </div>
                     <div class="col-lg-6">
                         <h1 class="page-header">Results</h1>
-                        <div class="table-responsive">
+                        <div id="authError" class="alert alert-danger" style="display:none;">
+                            <strong>ERROR</strong> Invalid manager authorization code
+                        </div>
+                        <div id="resultsTable" class="table-responsive">
                             <table class="table table-hover table-striped">
                                 <thead>
                                 <tr>
@@ -250,6 +256,9 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/main.js"></script>
+
 
 </body>
 

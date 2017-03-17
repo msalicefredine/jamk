@@ -152,26 +152,26 @@
 
                         <form>
                             <div class="checkbox">
-                                <label><input type="checkbox" value="">Junior Room</label>
+                                <label><input type="checkbox" name="clientRoomCheckbox" value="junior">Junior Room</label>
                             </div>
                             <div class="checkbox">
-                                <label><input type="checkbox" value="">Deluxe Room</label>
+                                <label><input type="checkbox" name="clientRoomCheckbox" value="deluxe">Deluxe Room</label>
                             </div>
                             <div class="checkbox">
-                                <label><input type="checkbox" value="">Queen Suite</label>
+                                <label><input type="checkbox" name="clientRoomCheckbox" value="queen">Queen Suite</label>
                             </div>
                             <div class="checkbox">
-                                <label><input type="checkbox" value="">Premium Suite</label>
+                                <label><input type="checkbox" name="clientRoomCheckbox" value="premium">Premium Suite</label>
                             </div>
                             <hr>
                             <div class="form-group" align="right">
-                                <button type="submit" class="btn btn-primary btn-block">Search</button>
+                                <button type="button" id="clientRoomSearchSubmit" class="btn btn-primary btn-block">Search</button>
                             </div>
                         </form>
                     </div>
                     <div class="col-lg-6">
                         <h1 class="page-header">Results</h1>
-                        <div class="table-responsive">
+                        <div id="resultsTable" class="table-responsive">
                             <table class="table table-hover table-striped">
                                 <thead>
                                 <tr>
@@ -228,6 +228,7 @@
                             </table>
                         </div>
                     </div>
+                    </div>
 
                     <!-- /.row -->
 
@@ -245,6 +246,8 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/main.js"></script>
 
 </body>
 

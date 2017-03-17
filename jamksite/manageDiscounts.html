@@ -153,27 +153,34 @@
                         <form>
                             <div class="input-group">
                                 <span class="input-group-addon">Authorization Code</span>
-                                <input id="auth" type="text" class="form-control" name="auth">
+                                <input id="managerAuth" type="text" class="form-control" name="auth">
                             </div>
                             <hr>
                             <h3>Get Discount Reports</h3>
-                            Run reports grouped by minimum or maximum average discount rates.<br><br>
+                            <ol class="breadcrumb">
+                                <li class="active">
+                                    Run reports grouped by minimum or maximum average discount rates.
+                                </li>
+                            </ol>
                             <div class="checkbox">
-                                <label><input type="checkbox" value="">Minimum average discount</label>
+                                <label><input name="discountsRadio" checked="checked" type="radio" value="min"> Minimum average discount</label>
                             </div>
                             <div class="checkbox">
-                                <label><input type="checkbox" value="">Maximum average discount</label>
+                                <label><input name="discountsRadio" type="radio" value="max"> Maximum average discount</label>
                             </div>
                             <br>
                             <hr>
                             <div class="form-group" align="right">
-                                <button type="submit" class="btn btn-primary btn-block">Search</button>
+                                <button type="button" id="manageDiscountsSubmit" class="btn btn-primary btn-block">Search</button>
                             </div>
                         </form>
                     </div>
                     <div class="col-lg-6">
                         <h1 class="page-header">Results</h1>
-                        <div class="table-responsive">
+                        <div id="authError" class="alert alert-danger" style="display:none;">
+                            <strong>ERROR</strong> Invalid manager authorization code
+                        </div>
+                        <div id="resultsTable" class="table-responsive">
                             <table class="table table-hover table-striped">
                                 <thead>
                                 <tr>
@@ -250,6 +257,8 @@
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/main.js"></script>
 
 </body>
 

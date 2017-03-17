@@ -20,6 +20,9 @@
     <!-- Morris Charts CSS -->
     <link href="css/plugins/morris.css" rel="stylesheet">
 
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
@@ -28,7 +31,6 @@
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <script src="main.js"></script>
     <![endif]-->
 
 </head>
@@ -153,38 +155,25 @@
                             </li>
                         </ol>
                         <form class="form-horizontal">
-                        <div class="radio">
-                            <label><input type="radio" name="optradio">Get All</label>
-                        </div>
-                        <div class="radio">
-                            <label><input type="radio" name="optradio">Name</label>
-                        </div>
-                        <div class="radio">
-                            <label><input type="radio" name="optradio">Phone Number</label>
-                        </div>
+                            <div class="radio" id="clientSearchRadio">
+                                <label><input checked="checked" type="radio" name="clientSearchRadio" value="all">Get All</label><br>
+                                <label><input type="radio" name="clientSearchRadio" value="name">Name</label><br>
+                                <label><input type="radio" name="clientSearchRadio" value="phone">Phone Number</label>
+                            </div>
                             <br>
-                        <h4>Filter by...</h4>
-                            <div class="form-group">
-                                <label class="control-label col-sm-2" for="client-name">Client Name</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="client-name" placeholder="Eg. John">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-2" for="client-phone">Phone Number</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="client-phone" placeholder="Eg, 555">
-                                </div>
-                            </div>
-                            <hr>
+                            <h4>Filter by...</h4>
+                            <strong>Client Name: </strong>
+                            <input type="text" id="client-name" placeholder="Eg. John"><br><br>
+                            <strong>Phone Number: </strong>
+                            <input type="text" id="client-phone" placeholder="Eg, 555"><hr>
                             <div class="form-group" align="right">
-                                <button type="submit" class="btn btn-primary btn-block">Search</button>
+                                <button type="button" class="btn btn-primary btn-block" id="clientSearchSubmit">Search</button>
                             </div>
                         </form>
                     </div>
                     <div class="col-lg-6">
                     <h1 class="page-header">Results</h1>
-                        <div class="table-responsive">
+                        <div id="resultsTable" class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
@@ -242,6 +231,7 @@
                     </div>
                 </div>
 
+                </div>
                 <!-- /.row -->
 
             </div>
@@ -259,10 +249,7 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
 
-    <!-- Morris Charts JavaScript -->
-    <script src="js/plugins/morris/raphael.min.js"></script>
-    <script src="js/plugins/morris/morris.min.js"></script>
-    <script src="js/plugins/morris/morris-data.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
 
