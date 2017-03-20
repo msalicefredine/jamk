@@ -40,22 +40,24 @@ FOREIGN KEY (eid) REFERENCES Employee
 ON DELETE CASCADE);
 
 CREATE TABLE Client
-	(ccNum INTEGER,
-	pNum CHAR(10),
-	Name CHAR(40),
-	PRIMARY KEY (ccNum));
+	(ccNum VARCHAR(16),
+	pNum VARCHAR(10),
+	Name VARCHAR(40),
+	PRIMARY KEY (ccNum),
+	constraint cc_check CHECK (length(ccNum) >= 16),
+	constraint pnum_check CHECK (length(pNum) >=10));
 
 CREATE TABLE RoomType
-	(rType CHAR(40),
-	bedType CHAR(40),
+	(rType VARCHAR(40),
+	bedType VARCHAR(40),
 	numBeds INTEGER,
 	rPrice INTEGER,
 	PRIMARY KEY (rType));
 
 CREATE TABLE Stay
 	(stayId INTEGER,
-	paymentType CHAR(40),
-	isPaid  CHAR(1),
+	paymentType VARCHAR(40),
+	isPaid  VARCHAR(1),
 	totalCost INTEGER,
 	checkinDate DATE,
 	checkoutDate DATE,
@@ -84,7 +86,7 @@ CREATE OR REPLACE TRIGGER stay_trigger
 
 CREATE TABLE Room
 	(rNum INTEGER,
-	rType CHAR(40),
+	rType VARCHAR(40),
 	PRIMARY KEY (rNum),
 FOREIGN KEY (rType)
 REFERENCES RoomType);
@@ -92,7 +94,7 @@ REFERENCES RoomType);
 CREATE TABLE Reservation
 	(confNo INTEGER,
 	rNum INTEGER NOT NULL,
-	ccNum INTEGER,
+	ccNum VARCHAR(16),
 	fromDate DATE,
 	toDate DATE,
 	stayId INTEGER,
