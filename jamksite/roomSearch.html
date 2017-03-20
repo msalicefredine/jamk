@@ -147,21 +147,37 @@
                             <h1 class="page-header">
                                 Room Search
                             </h1>
+                            <ol class="breadcrumb">
+                                <li class="active">
+                                    TODO - words
+                                </li>
+                            </ol>
 
                             <form>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Enter room number - TODO CONFIRM">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-default" type="submit">
-                                            <i class="glyphicon glyphicon-search"></i>
-                                        </button>
+
+                                <div class="form-group">
+                                    <div class="radio" id="clientSearchRadio">
+                                        <input checked="checked" type="radio" name="roomSearchRadio" value="floor">
+                                        <strong>Floor:</strong>
+                                        <select class="form-control" id="floorNumValue">
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                        </select>
+                                        <br>
+                                        <input type="radio" name="roomSearchRadio" value="roomNumber">
+                                        <strong>Or room number:</strong>
+                                        <input type="text" class="form-control" placeholder="Eg. 123" id="roomNumValue">
                                     </div>
+                                </div><hr>
+                                <div class="form-group" align="right">
+                                    <button type="button" id="roomSearchSubmit" class="btn btn-primary btn-block">Submit</button>
                                 </div>
                             </form>
                         </div>
                         <div class="col-lg-6">
                             <h1 class="page-header">Results</h1>
-                            <div class="table-responsive">
+                            <div id="resultsTable" class="table-responsive">
                                 <table class="table table-hover table-striped">
                                     <thead>
                                     <tr>
@@ -219,6 +235,7 @@
                         </div>
                     </div>
 
+                        </div>
                     <!-- /.row -->
 
                 </div>
@@ -236,18 +253,7 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
 
-    <!-- Morris Charts JavaScript -->
-    <script src="js/plugins/morris/raphael.min.js"></script>
-    <script src="js/plugins/morris/morris.min.js"></script>
-    <script src="js/plugins/morris/morris-data.js"></script>
-
-    <!-- Flot Charts JavaScript -->
-    <!--[if lte IE 8]><script src="js/excanvas.min.js"></script><![endif]-->
-    <script src="js/plugins/flot/jquery.flot.js"></script>
-    <script src="js/plugins/flot/jquery.flot.tooltip.min.js"></script>
-    <script src="js/plugins/flot/jquery.flot.resize.js"></script>
-    <script src="js/plugins/flot/jquery.flot.pie.js"></script>
-    <script src="js/plugins/flot/flot-data.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
 
