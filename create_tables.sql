@@ -40,11 +40,11 @@ FOREIGN KEY (eid) REFERENCES Employee
 ON DELETE CASCADE);
 
 CREATE TABLE Client
-	(ccNum VARCHAR(16),
+	(ccNum INTEGER,
 	pNum VARCHAR(10),
 	Name VARCHAR(40),
 	PRIMARY KEY (ccNum),
-	constraint cc_check CHECK (length(ccNum) >= 16),
+	constraint cc_check CHECK (length(ccNum) = 16),
 	constraint pnum_check CHECK (length(pNum) >=10));
 
 CREATE TABLE RoomType
@@ -94,7 +94,7 @@ REFERENCES RoomType);
 CREATE TABLE Reservation
 	(confNo INTEGER,
 	rNum INTEGER NOT NULL,
-	ccNum VARCHAR(16),
+	ccNum INTEGER,
 	fromDate DATE,
 	toDate DATE,
 	stayId INTEGER,
