@@ -47,7 +47,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">Hotel JAMK - Admin Panel</a>
+                <a class="navbar-brand" href="searchClient.php">Hotel JAMK - Admin Panel</a>
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
@@ -117,19 +117,19 @@
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
                     <li>
-                        <a href="index.html"><i class="fa fa-fw fa-user-circle" aria-hidden="true"></i> Client search</a>
+                        <a href="searchClient.php"><i class="fa fa-fw fa-user-circle" aria-hidden="true"></i> Client search</a>
                     </li>
                     <li class="active">
-                        <a href="roomSearch.html"><i class="fa fa-fw fa-bed"></i> Room search</a>
+                        <a href="searchRoom.php"><i class="fa fa-fw fa-bed"></i> Room search</a>
                     </li>
                     <li>
-                        <a href="clientRoomSearch.html"><i class="fa fa-fw fa-address-card"></i> Client-room search</a>
+                        <a href="clientRoomSearch.php"><i class="fa fa-fw fa-address-card"></i> Client-room search</a>
                     </li>
                     <li>
-                        <a href="manageDiscounts.html"><i class="fa fa-fw fa-usd"></i> Manage Discounts &nbsp;&nbsp;<i class="fa fa-lock"></i></a>
+                        <a href="manageDiscounts.php"><i class="fa fa-fw fa-usd"></i> Manage Discounts &nbsp;&nbsp;<i class="fa fa-lock"></i></a>
                     </li>
                     <li>
-                        <a href="manageRooms.html"><i class="fa fa-wrench"></i>&nbsp; Manage Rooms &nbsp;&nbsp;<i class="fa fa-lock"></i></a>
+                        <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp; Manage Rooms &nbsp;&nbsp;<i class="fa fa-lock"></i></a>
                     </li>
                 </ul>
             </div>
