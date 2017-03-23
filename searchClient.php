@@ -296,12 +296,12 @@ if (db_conn) {
 		if(isset($_POST["nameChecked"]) && isset($_POST["numberChecked"])){
 			$name = $_POST["filterName"];
 			$number = $_POST["filterNo"];
-			$result = executePlainSQL("select Name,pNum from Client where Name='".$name."' and pNum = '".$number."'");
+			$result = executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."') and pNum = '".$number."'");
 			printResult($result);
 		}
 		else if(isset($_POST["nameChecked"])){
 			$name = $_POST["filterName"];
-			$result = executePlainSQL("select Name,pNum from Client where Name='".$name."'");
+			$result = executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."')");
 			printResult($result);
 		}
 		else{
