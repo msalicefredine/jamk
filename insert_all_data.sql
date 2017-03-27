@@ -22,14 +22,14 @@ insert into manager values (12,12);
 insert into client values (4989907582686720,'6049413902','Forsythe');
 insert into client values (4959838800592759,'7780964161','Georgia');
 insert into client values (7826913623678846,'7781323698','Harrison');
-insert into client values (0119174113759682,'7787489586','Iris');
+insert into client values (1119174113759682,'7787489586','Iris');
 insert into client values (3872447749286203,'7780201024','Vivian');
 insert into client values (1694005478739191,'6045529300','Winona');
 insert into client values (7942843977867974,'6042736472','Xander');
-insert into client values (0530780613611425,'6047202350','Yolanda');
+insert into client values (1530780613611425,'6047202350','Yolanda');
 insert into client values (3886592480862634,'6042560842','Zakir');
-insert into client values (0983871238118716,'6044859199','Archie');
-insert into client values (0930098787904585,'6049201820','Betty');
+insert into client values (1983871238118716,'6044859199','Archie');
+insert into client values (1930098787904585,'6049201820','Betty');
 insert into client values (4323974896890768,'2062330645','Cheryl');
 insert into client values (6121338926447611,'2065615375','Danny');
 insert into client values (4390261429185836,'7806902720','Erika');
@@ -114,7 +114,7 @@ insert into reservation values (10,202,1504044092136631,'20170305','20170323',10
 insert into reservation values (11,301,8773701527287601,'20170909','20171010',11);
 insert into reservation values (12,203,1349693474168826,'20170101','20170115',12);
 insert into reservation values (13,103,8773701527287601,'20170328','20170410',13);
-insert into reservation values (14,108,0530780613611425,'20170202','20170203',14);
+insert into reservation values (14,108,1530780613611425,'20170202','20170203',14);
 insert into reservation values (15,113,7942843977867974,'20170329','20170415',15);
 
 insert into discounts values (1,1,10);
