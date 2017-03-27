@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,18 +18,14 @@
     <!-- Custom CSS -->
     <link href="css/sb-admin.css" rel="stylesheet">
 
-    <!-- Morris Charts CSS -->
-    <link href="css/plugins/morris.css" rel="stylesheet">
-
     <!-- Custom Fonts -->
-    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <script src="main.js"></script>
     <![endif]-->
 
 </head>
@@ -119,17 +116,17 @@
                     <li>
                         <a href="searchClient.php"><i class="fa fa-fw fa-user-circle" aria-hidden="true"></i> Client search</a>
                     </li>
-                    <li class="active">
+                    <li>
                         <a href="searchRoom.php"><i class="fa fa-fw fa-bed"></i> Room search</a>
                     </li>
-                    <li>
+                    <li class="active">
                         <a href="clientRoomSearch.php"><i class="fa fa-fw fa-address-card"></i> Client-room search</a>
                     </li>
                     <li>
                         <a href="manageDiscounts.php"><i class="fa fa-fw fa-usd"></i> Manage Discounts &nbsp;&nbsp;<i class="fa fa-lock"></i></a>
                     </li>
                     <li>
-                        <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp; Manage Rooms &nbsp;&nbsp;<i class="fa fa-lock"></i></a>
+                        <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp;Manage Rooms&nbsp;&nbsp; <i class="fa fa-lock"></i></a>
                     </li>
                 </ul>
             </div>
@@ -138,104 +135,105 @@
 
         <div id="page-wrapper">
 
-                <div class="container" style="min-height: 650px;">
+            <div class="container" style="min-height: 650px;">
 
-                    <!-- /.row -->
+                <!-- /.row -->
 
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <h1 class="page-header">
-                                Room Search
-                            </h1>
-                            <ol class="breadcrumb">
-                                <li class="active">
-                                    TODO - words
-                                </li>
-                            </ol>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h1 class="page-header">
+                            Client-Room Search
+                        </h1>
 
-                            <form action = "searchRoom.php" method = "post">
-
-                                <div class="form-group">
-                                    <div class="radio" id="clientSearchRadio">
-                                        <input type="radio" name="roomSearchRadioFloor" value="floor">
-                                        <strong>Floor:</strong>
-                                        <select class="form-control" type="number" id="floorNumValue" name="floorValue">
-                                            <option value="1">1</option>
-					    <option value="2">2</option>
-					    <option value="3">3</option>
-                                        </select>
-					<br>
-                                        <input type="radio" name="roomSearchRadioNumber" value="roomNumber">
-                                        <strong>Or room number:</strong>
-                                        <input type="text" name="searchbyRoom" class="form-control" placeholder="Eg. 123" id="roomNumValue">
-                                    </div>
-                                </div><hr>
-                                <div class="form-group" align="right">
-                                    <button type="submit" id="roomSearchSubmit" class="btn btn-primary btn-block">Submit</button>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-lg-6">
-                            <h1 class="page-header">Results</h1>
-                            <div id="resultsTable" class="table-responsive">
-                                <!--<table class="table table-hover table-striped">
-                                    <thead>
-                                    <tr>
-                                        <th>Page</th>
-                                        <th>Visits</th>
-                                        <th>% New Visits</th>
-                                        <th>Revenue</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>/index.html</td>
-                                        <td>1265</td>
-                                        <td>32.3%</td>
-                                        <td>$321.33</td>
-                                    </tr>
-                                    <tr>
-                                        <td>/about.html</td>
-                                        <td>261</td>
-                                        <td>33.3%</td>
-                                        <td>$234.12</td>
-                                    </tr>
-                                    <tr>
-                                        <td>/sales.html</td>
-                                        <td>665</td>
-                                        <td>21.3%</td>
-                                        <td>$16.34</td>
-                                    </tr>
-                                    <tr>
-                                        <td>/blog.html</td>
-                                        <td>9516</td>
-                                        <td>89.3%</td>
-                                        <td>$1644.43</td>
-                                    </tr>
-                                    <tr>
-                                        <td>/404.html</td>
-                                        <td>23</td>
-                                        <td>34.3%</td>
-                                        <td>$23.52</td>
-                                    </tr>
-                                    <tr>
-                                        <td>/services.html</td>
-                                        <td>421</td>
-                                        <td>60.3%</td>
-                                        <td>$724.32</td>
-                                    </tr>
-                                    <tr>
-                                        <td>/blog/post.html</td>
-                                        <td>1233</td>
-                                        <td>93.2%</td>
-                                        <td>$126.34</td>
-                                    </tr>
-                                    </tbody>
-                                </table>-->
-                        
+                        <ol class="breadcrumb">
+                            <li class="active">
+                                Find clients by room type of reservation
+                            </li>
+                        </ol>
+                        <!--<form action="clientRoomSearch.php" method="post">
+                            Name: <input type="text" name="name"><br>
+                            E-mail: <input type="text" name="email"><br>
+                            <input type="submit">
+                        </form>-->
+                        <form action="clientRoomSearch.php" method = "post">
+                            <div class="checkbox">
+                                <label><input type="checkbox" name="clientRoomCheckbox1" value="junior">Junior Room</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" name="clientRoomCheckbox2" value="deluxe">Deluxe Room</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" name="clientRoomCheckbox3" value="queen">Queen Suite</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input type="checkbox" name="clientRoomCheckbox4" value="premium">Premium Suite</label>
+                            </div>
+                            <hr>
+                            <div class="form-group" align="right">
+                                <button type="submit" id="clientRoomSearchSubmit" class="btn btn-primary btn-block">Search</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-lg-6">
+                        <h1 class="page-header">Results</h1>
+                        <div id="resultsTable" class="table-responsive">
+		    	<!--<table class="table table-hover table-striped">
+                                <thead>
+                                <tr>
+                                    <th>Page</th>
+                                    <th>Visits</th>
+                                    <th>% New Visits</th>
+                                    <th>Revenue</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>/index.html</td>
+                                    <td>1265</td>
+                                    <td>32.3%</td>
+                                    <td>$321.33</td>
+                                </tr>
+                                <tr>
+                                    <td>/about.html</td>
+                                    <td>261</td>
+                                    <td>33.3%</td>
+                                    <td>$234.12</td>
+                                </tr>
+                                <tr>
+                                    <td>/sales.html</td>
+                                    <td>665</td>
+                                    <td>21.3%</td>
+                                    <td>$16.34</td>
+                                </tr>
+                                <tr>
+                                    <td>/blog.html</td>
+                                    <td>9516</td>
+                                    <td>89.3%</td>
+                                    <td>$1644.43</td>
+                                </tr>
+                                <tr>
+                                    <td>/404.html</td>
+                                    <td>23</td>
+                                    <td>34.3%</td>
+                                    <td>$23.52</td>
+                                </tr>
+                                <tr>
+                                    <td>/services.html</td>
+                                    <td>421</td>
+                                    <td>60.3%</td>
+                                    <td>$724.32</td>
+                                </tr>
+                                <tr>
+                                    <td>/blog/post.html</td>
+                                    <td>1233</td>
+                                    <td>93.2%</td>
+                                    <td>$126.34</td>
+                                </tr>
+                                </tbody>
+                            </table> -->
 <?php 
 $db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("ora_d8c0b", "a33056145", $db);
+$db_conn = OCILogon("ora_t9d9", "a30583132", $db);
 
 
 
@@ -269,8 +267,7 @@ function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL com
 
 function printResult($result) { //prints results from a select statement
 	echo "<table class='table table-hover table-striped'>";
-	echo "<thead><tr><th>Room No.</th><th>Room Type</th></tr></thead>";
-
+	echo "<thead><tr><th>Credit Card</th><th>Phone No.</th><th>Name</th></tr></thead>";
 	echo "<tbody>";
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 		$number = count($row);
@@ -287,42 +284,78 @@ function printResult($result) { //prints results from a select statement
 
 if (db_conn) {
   	echo "Successfully connected to Oracle"."<br>";
-	
-	if(isset( $_POST["roomSearchRadioFloor"])){
-		$var1 = $_POST["floorValue"];	
-		$minfloor = $var1 * 100 - 1;
-		$maxfloor = ($var1 + 1) * 100;
-		$result = executePlainSQL("select * from room where rnum >". $minfloor." and rnum<".$maxfloor);
-		printResult($result);
-		//echo $floorNoString;
-	}	
+	$roomtypes = "";
+	$count = 0;
 
-	if(isset( $_POST["roomSearchRadioNumber"])){ 
-		$var2 =  $_POST["searchbyRoom"];
-		$roomstring = "$var2";
-		$querystring =  "select * from room where rnum = ".$roomstring;
-	$result = executePlainSQL($querystring);
-	printResult($result);
+
+	if(isset($_POST["clientRoomCheckbox1"]))
+		$count++;
+	if(isset($_POST["clientRoomCheckbox2"]))
+		$count++;
+	if(isset($_POST["clientRoomCheckbox3"]))
+		$count++;
+	if(isset($_POST["clientRoomCheckbox4"]))
+		$count++;
+	$initialcount = $count;
+
+	if(isset($_POST["clientRoomCheckbox1"])){
+		$var1 = $_POST["clientRoomCheckbox1"];
+		//$roomtypes = $roomtypes.$var1;
+		$roomtypes = $roomtypes."'SINGLE'";
+		if($count > 1){
+			$count--;
+			$roomtypes = $roomtypes.",";}
 	}
 	
+	if(isset($_POST["clientRoomCheckbox2"])){
+		$var2 = $_POST["clientRoomCheckbox2"];
+		//$roomtypes = $roomtypes.$var2;
+		$roomtypes = $roomtypes."'DOUBLE'";
+		if($count > 1){
+			$count--;
+			$roomtypes = $roomtypes.",";}
+	}
+	
+	if(isset($_POST["clientRoomCheckbox3"])){
+		$var3 = $_POST["clientRoomCheckbox3"];
+		//$roomtypes = $roomtypes.$var3;
+		$roomtypes = $roomtypes."'QUEEN'";
+		if($count > 1){
+			$count--;
+			$roomtypes = $roomtypes.",";}
+	}
+	
+	if(isset($_POST["clientRoomCheckbox4"])){
+		$var4 = $_POST["clientRoomCheckbox4"];
+		//$roomtypes = $roomtypes.$var4;
+		$roomtypes = $roomtypes."'KING'";
+		if($count > 1){
+			$count--;
+			$roomtypes = $roomtypes.",";}
+	}
 
-
+	echo $roomtypes;
+	if($initialcount > 0){
+	    $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";	
+	    $result = executePlainSQL($querystring);
+	    printResult($result);
+	}
   	OCILogoff($db_conn);
 } else {
   	$err = OCIError();
   	echo "Oracle Connect Error " . $err['message'];
 }
 ?>
-			</div>
+                        </div>
+                    </div>
                     </div>
 
-                        </div>
                     <!-- /.row -->
 
                 </div>
-            <!-- /.container-fluid -->
+                <!-- /.container-fluid -->
 
-        </div>
+            </div>
         <!-- /#page-wrapper -->
 
     </div>

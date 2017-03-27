@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,8 +17,14 @@
     <!-- Custom CSS -->
     <link href="css/sb-admin.css" rel="stylesheet">
 
+    <!-- Morris Charts CSS -->
+    <link href="css/plugins/morris.css" rel="stylesheet">
+
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
     <!-- Custom Fonts -->
-     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -113,20 +118,20 @@
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
-                    <li>
+                    <li class="active">
                         <a href="searchClient.php"><i class="fa fa-fw fa-user-circle" aria-hidden="true"></i> Client search</a>
                     </li>
                     <li>
                         <a href="searchRoom.php"><i class="fa fa-fw fa-bed"></i> Room search</a>
                     </li>
-                    <li class="active">
+                    <li>
                         <a href="clientRoomSearch.php"><i class="fa fa-fw fa-address-card"></i> Client-room search</a>
                     </li>
                     <li>
-                        <a href="manageDiscounts.php"><i class="fa fa-fw fa-usd"></i> Manage Discounts &nbsp;&nbsp;<i class="fa fa-lock"></i></a>
+                        <a href="manageDiscounts.php"><i class="fa fa-fw fa-usd"></i> Manage Discounts&nbsp;&nbsp;<i class="fa fa-lock"></i></a>
                     </li>
                     <li>
-                        <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp;Manage Rooms&nbsp;&nbsp; <i class="fa fa-lock"></i></a>
+                        <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp; Manage Rooms&nbsp;&nbsp;<i class="fa fa-lock"></i></a>
                     </li>
                 </ul>
             </div>
@@ -142,42 +147,35 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <h1 class="page-header">
-                            Client-Room Search
+                            Client Search
                         </h1>
-
                         <ol class="breadcrumb">
                             <li class="active">
-                                Find clients by room type of reservation
+                                Find clients by name, phone number, or both
                             </li>
                         </ol>
-                        <!--<form action="clientRoomSearch.php" method="post">
-                            Name: <input type="text" name="name"><br>
-                            E-mail: <input type="text" name="email"><br>
-                            <input type="submit">
-                        </form>-->
-                        <form action="clientRoomSearch.php" method = "post">
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox1" value="junior">Junior Room</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox2" value="deluxe">Deluxe Room</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox3" value="queen">Queen Suite</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox4" value="premium">Premium Suite</label>
-                            </div>
-                            <hr>
+                        <form class="form-horizontal" action="searchClient.php" method = "post">
+                            <!--<div class="radio" id="clientSearchRadio">
+                                <label><input type="radio" name="clientSearchRadioAll" value="all">Get All</label><br>
+                                <label><input type="radio" name="clientSearchRadioName" value="name">Name</label><br>
+                                <label><input type="radio" name="clientSearchRadioNumber" value="phone">Phone Number</label>
+                            </div>-->
+                            <br>
+                            <h4>Filter by...</h4>
+			    <strong><input type="radio" name="allChecked"> Get All</strong><br><br>	
+                            <strong><input type="radio" name="nameChecked"> Client Name: </strong>
+                            <input type="text" id="client-name" name ="filterName" placeholder="Eg. John"><br><br>
+                            <strong><input type="radio" name="numberChecked"> Phone Number: </strong>
+                            <input type="text" id="client-phone" name = "filterNo" placeholder="Eg, 555"><hr>
                             <div class="form-group" align="right">
-                                <button type="submit" id="clientRoomSearchSubmit" class="btn btn-primary btn-block">Search</button>
+                                <button type="submit" class="btn btn-primary btn-block" id="clientSearchSubmit">Search</button>
                             </div>
                         </form>
                     </div>
                     <div class="col-lg-6">
-                        <h1 class="page-header">Results</h1>
+                    <h1 class="page-header">Results</h1>
                         <div id="resultsTable" class="table-responsive">
-		    	<!--<table class="table table-hover table-striped">
+                            <!--<table class="table table-hover">
                                 <thead>
                                 <tr>
                                     <th>Page</th>
@@ -230,10 +228,11 @@
                                     <td>$126.34</td>
                                 </tr>
                                 </tbody>
-                            </table> -->
+                            </table>-->
+                    
 <?php 
 $db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("ora_d8c0b", "a33056145", $db);
+$db_conn = OCILogon("ora_t9d9", "a30583132", $db);
 
 
 
@@ -266,8 +265,8 @@ function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL com
 }
 
 function printResult($result) { //prints results from a select statement
-	echo "<table class='table table-hover table-striped'>";
-	echo "<thead><tr><th>Credit Card</th><th>Phone No.</th><th>Name</th></tr></thead>";
+	echo "<table class='table table-hover'>";
+	echo "<thead><tr><th>Client Name</th><th>Phone No</th></tr></thead>";
 	echo "<tbody>";
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 		$number = count($row);
@@ -284,78 +283,72 @@ function printResult($result) { //prints results from a select statement
 
 if (db_conn) {
   	echo "Successfully connected to Oracle"."<br>";
-	$roomtypes = "";
-	$count = 0;
-
-
-	if(isset($_POST["clientRoomCheckbox1"]))
-		$count++;
-	if(isset($_POST["clientRoomCheckbox2"]))
-		$count++;
-	if(isset($_POST["clientRoomCheckbox3"]))
-		$count++;
-	if(isset($_POST["clientRoomCheckbox4"]))
-		$count++;
-	$initialcount = $count;
-
-	if(isset($_POST["clientRoomCheckbox1"])){
-		$var1 = $_POST["clientRoomCheckbox1"];
-		//$roomtypes = $roomtypes.$var1;
-		$roomtypes = $roomtypes."'SINGLE'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
+	if(isset($_POST["allChecked"])){
 	
-	if(isset($_POST["clientRoomCheckbox2"])){
-		$var2 = $_POST["clientRoomCheckbox2"];
-		//$roomtypes = $roomtypes.$var2;
-		$roomtypes = $roomtypes."'DOUBLE'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
-	
-	if(isset($_POST["clientRoomCheckbox3"])){
-		$var3 = $_POST["clientRoomCheckbox3"];
-		//$roomtypes = $roomtypes.$var3;
-		$roomtypes = $roomtypes."'QUEEN'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
-	
-	if(isset($_POST["clientRoomCheckbox4"])){
-		$var4 = $_POST["clientRoomCheckbox4"];
-		//$roomtypes = $roomtypes.$var4;
-		$roomtypes = $roomtypes."'KING'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
+	$result = executePlainSQL("select Name,pNum from Client");
+	printResult($result);
+
 	}
 
-	echo $roomtypes;
-	if($initialcount > 0){
-	    $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";	
-	    $result = executePlainSQL($querystring);
-	    printResult($result);
+	else{
+	
+	if(isset($_POST["nameChecked"]) || isset($_POST["numberChecked"])){
+		if(isset($_POST["nameChecked"]) && isset($_POST["numberChecked"])){
+			$name = $_POST["filterName"];
+			$number = $_POST["filterNo"];
+			$result = executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."') and pNum = '".$number."'");
+			printResult($result);
+		}
+		else if(isset($_POST["nameChecked"])){
+			$name = $_POST["filterName"];
+			$result = executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."')");
+			printResult($result);
+		}
+		else{
+
+			$number = $_POST["filterNo"];
+			$result = executePlainSQL("select Name,pNum from Client where pNum='".$number."'");
+			printResult($result);
+		}
 	}
+
+	}
+	/*if(isset( $_POST["clientSearchRadioAll"])){ 
+
+	$result = executePlainSQL("select Name,pNum from Client");
+	printResult($result);}
+	else{
+		
+	if(isset( $_POST["clientSearchRadioName"])){ 
+
+	$result = executePlainSQL("select Name from Client");
+	printResult($result);}
+
+	if(isset( $_POST["clientSearchRadioNumber"])){ 
+
+	$result = executePlainSQL("select pNum from Client");
+	printResult($result);}
+	}*/	
+
+
   	OCILogoff($db_conn);
 } else {
   	$err = OCIError();
   	echo "Oracle Connect Error " . $err['message'];
 }
 ?>
-                        </div>
-                    </div>
-                    </div>
 
-                    <!-- /.row -->
+
+			</div>
+                </div>
 
                 </div>
-                <!-- /.container-fluid -->
+                <!-- /.row -->
 
             </div>
+            <!-- /.container-fluid -->
+
+        </div>
         <!-- /#page-wrapper -->
 
     </div>
