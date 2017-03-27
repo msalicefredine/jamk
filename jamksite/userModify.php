@@ -114,6 +114,7 @@
                         include('db.php');
 
 $retrievedReservation = null;
+$roomTypes = DB::getInstance()->executePlainSQL("select rtype from Roomtype");
 
 if ($db_conn) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -126,40 +127,73 @@ if ($db_conn) {
      			$confNum = $_POST['conf-num'];
     			$result = DB::getInstance()->executePlainSQL("select * from modify_reservation
     			         where ccNum=".$ccNum." and confNo=".$confNum);
+    		    echo "select * from modify_reservation
+    			         where ccNum=".$ccNum." and confNo=".$confNum;
     			$retrievedReservation = OCI_Fetch_Array($result, OCI_BOTH);
-    			unset($_POST['userRetrieveSubmit']);
             }
+            unset($_POST['userRetrieveSubmit']);
             // Commit to save changes
             OCI_COMMIT($db_conn);
         } else if (isset($_POST['userModifySubmit'])) {
 
             // Handle update reservation
             if (isset($_POST['client-name']) && isset($_POST['start-date']) && isset($_POST['end-date'])
-                  && isset($_POST['num-guests']) && isset($_POST['client-phone'])) {
+                  && isset($_POST['room-type']) && isset($_POST['client-phone'])) {
 
     			$ccNum=$_POST['client-ccnum'];
     			$confNo=$_POST['res-confno'];
     			$clientName=$_POST['client-name'];
     			$startDate=$_POST['start-date'];
     			$endDate=$_POST['end-date'];
-    			$numGuests=$_POST['num-guests'];
     			$pnum=$_POST['client-phone'];
+    			$rtype=$_POST['room-type'];
+    			$oldRtype=$_POST['old-roomtype'];
 
     			// Update client table
     			$clientResult= DB::getInstance()->executePlainSQL("update client set pnum='".$pnum."', name='".$clientName."'
     				where ccNum='".$ccNum."'");
+    			/*echo "update client set pnum='".$pnum."', name='".$clientName."'
+    				where ccNum='".$ccNum."'";*/
 
     			// Update reservation
     			$reservationResult= DB::getInstance()->executePlainSQL("update reservation set toDate='".$endDate."',
     			 fromDate='".$startDate."' where confNo='".$confNo."'");
-    			 // TODO: Handle updated number of guests
+
+				// Handle updated roomtype (if changed)
+				if ($rtype != $oldRtype) {
+					// If there's an available room of the new type, update it.
+					$rooms = DB::getInstance()->executePlainSQL("select * from room r inner join reservation res on r.rnum=res.rnum
+						where r.rtype='".$rtype."' and not
+						((res.fromDate <= '".$endDate."') and (res.toDate >= '".$startDate."'))");
+					if ($rooms) {
+						// echo 'got some';
+						$room = OCI_Fetch_Array($rooms, OCI_BOTH);
+						if ($room) {
+						    // echo $room["RNUM"];
+							$reservationResult= DB::getInstance()->executePlainSQL("update reservation set
+							  rNum='".$room["RNUM"]."' where confNo='".$confNo."'");
+						} else {
+							// Return an error if there are no available rooms of the requested type
+							echo '<div class="alert alert-danger alert-dismissable">';
+							echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+							echo '<strong>We were unable to change your room type! </strong>';
+							echo 'There are no avaiable '.$rtype.' rooms.';
+							echo "</div>";
+						}
+
+					}
+
+				}
+				// Commit to save changes
+				OCICOMMIT($db_conn);
 
     			// Get updated reservation so we can display it to the user
     			$updateResult= DB::getInstance()->executePlainSQL("select * from modify_reservation
     			         where ccNum=".$ccNum." and confNo=".$confNo);
+
     			$updatedRes=OCI_Fetch_Array($updateResult,OCI_BOTH);
     			// Commit to save changes
-    			OCICOMMIT($db_conn);
+    			// OCICOMMIT($db_conn);
 
             }
         }
@@ -174,14 +208,12 @@ if ($db_conn) {
 	echo "</div>";
 }
 
-
-
-                         if ($updatedRes) {
+                if ($updatedRes) {
                     echo '<div class="alert alert-success alert-dismissable">';
                     echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
 
                         echo '<h1 class="page-header">Confirmation</h1>';
-                        echo '<h5>Thank you. Your reservation has been updated</h5>';
+                        echo '<h5>View your reservation.</h5>';
                         echo '<strong>Your confirmation number is still: '.$updatedRes['CONFNO'].'</strong>';
                         echo '<br>';
                         echo '<div class="table-responsive">';
@@ -191,7 +223,7 @@ if ($db_conn) {
                                     echo '<th>Name</th>';
                                     echo '<th>Start Date</th>';
                                     echo '<th>End Date</th>';
-                                    echo '<th>Guests</th>';
+                                    echo '<th>Room Type</th>';
                                     echo '<th>Contact Number</th>';
                                 echo '</tr>';
                                 echo '</thead>';
@@ -201,7 +233,7 @@ if ($db_conn) {
                                     echo '<td>'.$updatedRes['NAME'].'</td>';
                                     echo '<td>'.$updatedRes['FROMDATE'].'</td>';
                                     echo '<td>'.$updatedRes['TODATE'].'</td>';
-                                    echo '<td>'.$updatedRes['NUMBEDS'].'</td>';
+                                    echo '<td>'.$updatedRes['RTYPE'].'</td>';
                                     echo '<td>'.$updatedRes['PNUM'].'</td>';
                                 echo '</tr>';
 
@@ -273,12 +305,26 @@ if ($db_conn) {
                             </div>
                             <br>
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-fw fa-user-plus"></i></span>
+                                <span class="input-group-addon"><i class="fa fa-fw fa-home"></i></span>
                                 <?php
                                 if ($retrievedReservation) {
-    								echo '<input id="num-guests" type="text" class="form-control" name="num-guests" value='.$retrievedReservation["NUMBEDS"].'>';
+                                	$targetType = $retrievedReservation["RTYPE"];
+    								echo '<select id="room-type" class="form-control" name="room-type" >';
+                                    while ($rtype = OCI_Fetch_Array($roomTypes, OCI_BOTH)) {
+                                    	if ($targetType == $rtype["RTYPE"]) {
+                                    		echo '<option selected="selected" value="'.$targetType.'">'.$targetType.'</option>';
+                                    	} else {
+                                    		echo '<option value="'.$rtype["RTYPE"].'">'.$rtype["RTYPE"].'</option>';
+                                    	}
+                                    }
+                                    echo '</select>';
                                 } else {
-                                    echo '<input id="num-guests" type="text" class="form-control" name="num-guests" placeholder="Number of Guests">';
+                                    echo '<select id="room-type" class="form-control" name="room-type" >';
+                                    echo '<option selected disabled>Select a Room Type</option>';
+                                    while ($rtype = OCI_Fetch_Array($roomTypes, OCI_BOTH)) {
+                                    	echo '<option value="'.$rtype["RTYPE"].'">'.$rtype["RTYPE"].'</option>';
+                                    }
+                                    echo '</select>';
                                 }
                                 ?>
                             </div>
@@ -296,6 +342,7 @@ if ($db_conn) {
                             <?php
                              echo '<input type="hidden" id="client-ccnum" name="client-ccnum" value='.$retrievedReservation["CCNUM"].' >';
                              echo '<input type="hidden" id="res-confno" name="res-confno" value='.$retrievedReservation["CONFNO"].' >';
+                             echo '<input type="hidden" id="old-roomtype" name="old-roomtype" value='.$retrievedReservation["RTYPE"].' >';
                             ?>
                             <br>
                             <?php

@@ -135,8 +135,7 @@ REFERENCES Stay
 ON DELETE CASCADE);
 
 CREATE VIEW modify_reservation AS
-SELECT c.name,c.ccnum,r.confno,r.fromdate,r.todate,c.pnum,rt.numbeds
+SELECT c.name,c.ccnum,r.confno,r.fromdate,r.todate,c.pnum,rm.rtype
 from Reservation r inner join Client c on c.ccNum=r.ccNum
-	inner join Room rm on r.rnum=rm.rnum
-	inner join RoomType rt on rm.rtype=rt.rtype;
+	inner join Room rm on r.rnum=rm.rnum;
 
