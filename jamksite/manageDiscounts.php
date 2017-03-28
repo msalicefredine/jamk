@@ -146,7 +146,7 @@
                             Manage Discounts
                         </h1>
 
-                        <div class="alert alert-danger">
+                        <div class="alert alert-warning">
                                 <strong>Managers only</strong> - code is required
                         </div>
 
@@ -162,7 +162,7 @@
                                     Run reports grouped by minimum or maximum average discount rates.
                                 </li>
                             </ol>
-                            
+
                             <div class="checkbox">
                                 <label><input name="discount" checked="checked" type="radio" value="avg"> Average per Manager</label>
                             </div>
@@ -189,7 +189,6 @@
                             <div class="checkbox">
                                 <label><input name="extra" type="radio" value="minimum"> Minimum</label>
                             </div>
-                            
                             <br>
                             <hr>
                             <div class="form-group" align="right">
@@ -257,41 +256,9 @@
                                 </tr>
                                 </tbody>
                             </table>-->
-                        
-<?php 
-$db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("", "", $db);
 
-
-
-
-
-function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
-	//echo "<br>running ".$cmdstr."<br>";
-	global $db_conn, $success;
-	$statement = OCIParse($db_conn, $cmdstr); //There is a set of comments at the end of the file that describe some of the OCI specific functions and how they work
-
-	if (!$statement) {
-		echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-		$e = OCI_Error($db_conn); // For OCIParse errors pass the       
-		// connection handle
-		echo htmlentities($e['message']);
-		$success = False;
-	}
-
-	$r = OCIExecute($statement, OCI_DEFAULT);
-	if (!$r) {
-		echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-		$e = oci_error($statement); // For OCIExecute errors pass the statementhandle
-		echo htmlentities($e['message']);
-		$success = False;
-	} else {
-
-	}
-	return $statement;
-
-}
-
+<?php
+include('db.php');
 
 function printResult($result) { //prints results from a select statement
 	echo "<table class='table table-hover table-striped'>";
@@ -303,18 +270,18 @@ function printResult($result) { //prints results from a select statement
 	if(isset($_POST["extra"])){
 		$var1 = $_POST["extra"];
 		if($var1 == "maximum")
-			$value = -1; 
+			$value = -1;
 		elseif($var1 == "minimum")
 			$value = PHP_INT_MAX;
-	
-		
+
+
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 		/*$number = count($row);
-		
+
 		echo "<tr>";
 		for($i = 0; $i < $number; $i++)
 			echo "<td>".$row[$i]."</td>";
-		
+
 		echo "</tr>";*/
 
 		if($var1 == "maximum"){
@@ -322,7 +289,7 @@ function printResult($result) { //prints results from a select statement
 				$extraRow = $row;
 				$value = $row[2];
 				}
-				
+
 		}
 		elseif($var1 == "minimum"){
 			if($row[2] < $value){
@@ -330,8 +297,8 @@ function printResult($result) { //prints results from a select statement
 				$value = $row[2];
 				}
 		}
-			
-		
+
+
 	}
 	printRow($extraRow);
 	}
@@ -347,19 +314,19 @@ function printResult($result) { //prints results from a select statement
 
 function printRow($row){
 	$number = count($row);
-		
+
 	echo "<tr>";
 	for($i = 0; $i < $number; $i++)
 		echo "<td>".$row[$i]."</td>";
-		
+
 	echo "</tr>";
 }
 
 function checkCode(){
-	
+
 	$correctCode = false;
-	
-	$result = executePlainSQL("select overridecode from manager");
+
+	$result = DB::getInstance()->executePlainSQL("select overridecode from manager");
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 		if($row[0] == $_POST["auth"]){
 			$correctCode = true;
@@ -369,12 +336,12 @@ function checkCode(){
 	return $correctCode;
 }
 
-if (db_conn) {
+if ($db_conn) {
   	if($_POST["auth"] ){
-  		if(checkCode()){  	
+  		if(checkCode()){
   			if(isset($_POST["discount"])){
   				$var1 = $_POST["discount"];
-				$result = executePlainSQL("select e.name, d.eid, ".$var1."(d.amount) from employee e, discounts d where e.eid = d.eid group by e.name, d.eid");
+				$result = DB::getInstance()->executePlainSQL("select e.name, d.eid, ".$var1."(d.amount) from employee e, discounts d where e.eid = d.eid group by e.name, d.eid");
 				printResult($result);
 			}
 		}
@@ -382,21 +349,25 @@ if (db_conn) {
 			 echo "<div id='authError' class='alert alert-danger'>";
         	 echo  "<strong>ERROR</strong> Invalid manager authorization code";
        		 echo "</div>";
-			
+
 		}
 	}
 	else{
 		echo "<div id='authError' class='alert alert-danger'>";
-        //echo  "<strong>ERROR</strong> Invalid manager authorization code";
         echo "Please enter the manager authorization code";
         echo "</div>";
 
 	}
-	
+
   	OCILogoff($db_conn);
 } else {
-  	$err = OCIError();
-  	echo "Oracle Connect Error " . $err['message'];
+ 	echo '<div class="alert alert-danger alert-dismissable">';
+	echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+	echo '<strong>Oracle Connect Error! </strong>';
+		$e = OCI_Error(); // For OCIParse errors pass the
+		// connection handle
+		echo htmlentities($e['message']);
+	echo "</div>";
 }
 ?>
 
