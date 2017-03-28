@@ -237,7 +237,7 @@
 
 <?php 
 $db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("ora_t9d9", "a30583132", $db);
+$db_conn = OCILogon("", "", $db);
 
 
 
