@@ -22,10 +22,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     oci_execute($stid);
 
     // step 2: add reservation to reservation table
-    $StartDate = $_POST['start-date'];
-    $EndDate = $_POST['end-date'];
+    $FromDate = $_POST['start-date'];
+    $ToDate = $_POST['end-date'];
     $RoomType = $_POST['room-type'];
+    $RoomNumber = 101;
 
+    $sql = "INSERT INTO Reservation (RNUM, CCNUM, FROMDATE, TODATE, STAYID) VALUES ($RoomNumber, $CreditCardNumber, '$FromDate', '$ToDate', NULL)";
+
+    $stid = oci_parse($db_conn, $sql);
+
+    oci_execute($stid);
 
 }
 
@@ -171,7 +177,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                                     echo "<select id='room-type' class='form-control' name='room-type'>";
                                     echo "<option disabled selected value>Select a Room Type</option>";
                                     while ($row = oci_fetch_array($stid)) {
-                                        // echo "<option value='$row['rType']' selected='selected'>".$row['rType']."</option>";
                                         echo "<option value='".$row['RTYPE']."'>".$row['RTYPE']."</option>";
                                     }
                                     echo "</select>";
@@ -204,19 +209,24 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                                     <thead>
                                         <tr>
                                             <th>Name</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Guests</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Room Type</th>
                                             <th>Contact Number</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <?php echo "<td>$RoomType</td>"; ?>
-                                            <td>05/01/17</td>
-                                            <td>05/03/17</td>
-                                            <td>3</td>
-                                            <td>101-555-5209</td>
+                                            <?php 
+                                            $sql = "INSERT INTO Reservation (RNUM, CCNUM, FROMDATE, TODATE, STAYID) VALUES ($RoomNumber, $CreditCardNumber, '$FromDate', '$ToDate', $StayID)";
+
+                                            echo "<td>$ClientName</td>"; 
+                                            echo "<td>$FromDate</td>";
+                                            echo "<td>$ToDate</td>";
+                                            echo "<td>$RoomType</td>";
+                                            echo "<td>$PhoneNumber</td>";
+                                            echo "<td>$sql</td>";
+                                            ?>
                                         </tr>
                                     </tbody>
                                 </table>
