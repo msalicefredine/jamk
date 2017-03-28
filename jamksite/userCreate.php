@@ -92,7 +92,7 @@
                             <a href="userCreate.php"><i class="fa fa-fw fa-bookmark" aria-hidden="true"></i> Create Reservation</a>
                         </li>
                         <li>
-                            <a href="userModify.html"><i class="fa fa-fw fa-ellipsis-h"></i> Modify Reservation</a>
+                            <a href="userModify.php"><i class="fa fa-fw fa-ellipsis-h"></i> Modify Reservation</a>
                         </li>
                     </ul>
                 </div>
@@ -147,6 +147,7 @@
                                 // check if there are any available rooms of the indicated room type
                                 $RoomType = $_POST['room-type'];
 
+                                // TODO: fix logic statement
                                 $sql = "SELECT MAX(rm.rNum) AS MAXRNUM FROM Room rm, Reservation rsv WHERE rm.rType='$RoomType' AND rm.rNum = rsv.rNum AND (rsv.fromDate > '$ToDate' OR rsv.toDate < '$FromDate')";
                                 $stid = oci_parse($db_conn, $sql);
                                 oci_execute($stid);
