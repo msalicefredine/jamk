@@ -113,10 +113,10 @@
                 <div class="collapse navbar-collapse navbar-ex1-collapse">
                     <ul class="nav navbar-nav side-nav">
                         <li>
-                            <a href="index.php"><i class="fa fa-fw fa-user-circle" aria-hidden="true"></i> Client search</a>
+                            <a href="searchClient.php"><i class="fa fa-fw fa-user-circle" aria-hidden="true"></i> Client search</a>
                         </li>
                         <li>
-                            <a href="roomSearch.php"><i class="fa fa-fw fa-bed"></i> Room search</a>
+                            <a href="searchRoom.php"><i class="fa fa-fw fa-bed"></i> Room search</a>
                         </li>
                         <li>
                             <a href="clientRoomSearch.php"><i class="fa fa-fw fa-address-card"></i> Client-room search</a>
@@ -156,15 +156,48 @@
                             }
 
                             if ($_SERVER['REQUEST_METHOD'] == "POST") {
-                                // delete roomtype from roomtype table
-                                $RoomType = $_POST['room-type'];
-                                $sql = "DELETE FROM RoomType WHERE rType='$RoomType'";
+                                // ensure that manager authorization key is correct
+                                $AuthorizationCode = $_POST['auth'];
+                                $sql = "SELECT overrideCode FROM Manager";
                                 $stid = oci_parse($db_conn, $sql);
                                 oci_execute($stid);
+
+                                $CorrectCode=FALSE;
+                                while ($row = oci_fetch_array($stid)) {
+                                    if ($row[0] == $AuthorizationCode) {
+                                        $CorrectCode = TRUE;
+                                        break;
+                                    }
+                                }
+
+                                if (!$CorrectCode) {
+                                    echo "<div id='authError' class='alert alert-danger'>";
+                                    echo "<strong>ERROR</strong> Invalid manager authorization code";
+                                    echo "</div>"; 
+                                } else {
+                                    // delete roomtype from roomtype table
+                                    $RoomType = $_POST['room-type'];
+                                    $sql = "DELETE FROM RoomType WHERE rType='$RoomType'";
+                                    $stid = oci_parse($db_conn, $sql);
+                                    $result = oci_execute($stid);
+
+                                // if foreign key constraint violated display error message
+                                    if (!$result) {
+                                        echo '<div class="alert alert-danger alert-dismissable">';
+                                        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+                                        echo '<strong>Database Error! </strong>';
+                                        echo "Cannot execute the following command: " . $sql . "<br>";
+                                        $e = oci_error($stid); // For OCIExecute errors pass the statementhandle
+                                        echo htmlentities($e['message']);
+                                        echo "</div>";
+                                    } else {
+                                        echo "Success!";
+                                    }
+                                }
                             }
                             ?>
 
-                            <div class="alert alert-danger">
+                            <div class="alert alert-warning">
                                 <strong>Managers only</strong> - code is required
                             </div>
                             <form action="manageRooms.php" method="POST">
@@ -182,12 +215,12 @@
 
                                 <div class="input-group">
                                     <?php
-                                // select roomtypes offered by the hotel
+                                    // select roomtypes offered by the hotel
                                     $sql = "SELECT rType FROM RoomType";
                                     $stid = oci_parse($db_conn, $sql);
                                     oci_execute($stid);
 
-                                // display roomtypes as roomtype options
+                                    // display roomtypes as roomtype options
                                     echo "<select id='room-type' class='form-control' name='room-type'>";
                                     echo "<option disabled selected value>Select a Room Type</option>";
                                     while ($row = oci_fetch_array($stid)) {
@@ -205,63 +238,31 @@
                         </div>
                         <div class="col-lg-6">
                             <h1 class="page-header">Results</h1>
-                            <div id="authError" class="alert alert-danger" style="display:none;">
-                                <strong>ERROR</strong> Invalid manager authorization code
-                            </div>
                             <div id="resultsTable" class="table-responsive">
                                 <table class="table table-hover table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Page</th>
-                                            <th>Visits</th>
-                                            <th>% New Visits</th>
-                                            <th>Revenue</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>/index.html</td>
-                                            <td>1265</td>
-                                            <td>32.3%</td>
-                                            <td>$321.33</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/about.html</td>
-                                            <td>261</td>
-                                            <td>33.3%</td>
-                                            <td>$234.12</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/sales.html</td>
-                                            <td>665</td>
-                                            <td>21.3%</td>
-                                            <td>$16.34</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/blog.html</td>
-                                            <td>9516</td>
-                                            <td>89.3%</td>
-                                            <td>$1644.43</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/404.html</td>
-                                            <td>23</td>
-                                            <td>34.3%</td>
-                                            <td>$23.52</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/services.html</td>
-                                            <td>421</td>
-                                            <td>60.3%</td>
-                                            <td>$724.32</td>
-                                        </tr>
-                                        <tr>
-                                            <td>/blog/post.html</td>
-                                            <td>1233</td>
-                                            <td>93.2%</td>
-                                            <td>$126.34</td>
-                                        </tr>
-                                    </tbody>
+                                    <?php
+                                    if ($CorrectCode) {
+                                        echo "<thead>";
+                                        echo "<tr>";
+                                        echo "<th>Room Type</th>";
+                                        echo "<th>Bed Type</th>";
+                                        echo "<th>Number of Beds</th>";
+                                        echo "<th>Price</th>";
+                                        echo "</tr>";
+                                        echo "</thead>";
+                                        echo "<tbody>";;
+                                        $sql = "SELECT * FROM RoomType";
+                                        $stid = oci_parse($db_conn, $sql);
+                                        oci_execute($stid);
+                                        while($row = oci_fetch_array($stid)) {
+                                            echo "<tr><td>".$row["RTYPE"]."</td><td>".$row["BEDTYPE"]."</td><td>".$row["NUMBEDS"]."</td><td>".$row["RPRICE"]."</td></tr>";
+                                        } 
+                                    } else {
+                                        echo "<div id='authError' class='alert alert-danger'>";
+                                        echo "Please enter the manager authorization code";
+                                        echo "</div>";
+                                    }
+                                    ?>
                                 </table>
                             </div>
                         </div>
