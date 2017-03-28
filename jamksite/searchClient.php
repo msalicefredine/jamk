@@ -17,6 +17,9 @@
     <!-- Custom CSS -->
     <link href="css/sb-admin.css" rel="stylesheet">
 
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
@@ -25,7 +28,6 @@
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <script src="main.js"></script>
     <![endif]-->
 
 </head>
@@ -113,7 +115,7 @@
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
-                    <li>
+                    <li class="active">
                         <a href="searchClient.php"><i class="fa fa-fw fa-user-circle" aria-hidden="true"></i> Client search</a>
                     </li>
                     <li>
@@ -122,11 +124,11 @@
                     <li>
                         <a href="clientRoomSearch.php"><i class="fa fa-fw fa-address-card"></i> Client-room search</a>
                     </li>
-                    <li class="active">
-                        <a href="manageDiscounts.php"><i class="fa fa-fw fa-usd"></i> Manage Discounts &nbsp;&nbsp;<i class="fa fa-lock"></i></a>
+                    <li>
+                        <a href="manageDiscounts.php"><i class="fa fa-fw fa-usd"></i> Manage Discounts&nbsp;&nbsp;<i class="fa fa-lock"></i></a>
                     </li>
                     <li>
-                        <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp; Manage Rooms&nbsp;&nbsp; <i class="fa fa-lock"></i></a>
+                        <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp; Manage Rooms&nbsp;&nbsp;<i class="fa fa-lock"></i></a>
                     </li>
                 </ul>
             </div>
@@ -141,104 +143,47 @@
 
                 <div class="row">
                     <div class="col-lg-6">
-
                         <h1 class="page-header">
-                            Manage Discounts
+                            Client Search
                         </h1>
+                        <ol class="breadcrumb">
+                            <li class="active">
+                                Find clients by name, phone number, or both
+                            </li>
+                        </ol>
+                        <form class="form-horizontal" action="searchClient.php" method = "post">
+                            <!--<div class="radio" id="clientSearchRadio">
+                                <label><input type="radio" name="clientSearchRadioAll" value="all">Get All</label><br>
+                                <label><input type="radio" name="clientSearchRadioName" value="name">Name</label><br>
+                                <label><input type="radio" name="clientSearchRadioNumber" value="phone">Phone Number</label>
+                            </div>-->
+                            <h4>Find clients by...</h4>
 
-                        <div class="alert alert-danger">
-                                <strong>Managers only</strong> - code is required
-                        </div>
 
-                        <form action="manageDiscounts.php" method="post">
-                            <div class="input-group">
-                                <span class="input-group-addon">Authorization Code</span>
-                                <input id="managerAuth" type="text" class="form-control" name="auth">
-                            </div>
-                            <hr>
-                            <h3>Get Discount Reports</h3>
-                            <ol class="breadcrumb">
-                                <li class="active">
-                                    Run reports grouped by minimum or maximum average discount rates.
-                                </li>
-                            </ol>
-                            <div class="checkbox">
-                                <label><input name="discountsRadio" checked="checked" type="radio" value="min"> Minimum average discount</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input name="discountsRadio" type="radio" value="max"> Maximum average discount</label>
-                            </div>
-                            <br>
-                            <hr>
+
+                            <select name="allOrSearch">
+                                <option selected value="allChecked">Get All</option>
+                                <option value="searchByChecked">Search By...</option>
+                            </select><br><br>
+                            <h4>Search by options</h4>
+                            <strong><input type="radio" name="nameChecked"> Client Name: </strong>
+                            <input type="text" id="client-name" name ="filterName" placeholder="Eg. John"><br><br>
+                            <strong><input type="radio" name="numberChecked"> Phone Number: </strong>
+                            <input type="text" id="client-phone" name = "filterNo" placeholder="Eg, 555"><hr>
                             <div class="form-group" align="right">
-                                <button type="submit" id="manageDiscountsSubmit" class="btn btn-primary btn-block">Search</button>
+                                <button type="submit" class="btn btn-primary btn-block" id="clientSearchSubmit">Search</button>
                             </div>
+
                         </form>
                     </div>
                     <div class="col-lg-6">
-                        <h1 class="page-header">Results</h1>
-                        <div id="authError" class="alert alert-danger" style="display:none;">
-                            <strong>ERROR</strong> Invalid manager authorization code
-                        </div>
+                    <h1 class="page-header">Results</h1>
                         <div id="resultsTable" class="table-responsive">
-                            <!--<table class="table table-hover table-striped">
-                                <thead>
-                                <tr>
-                                    <th>Page</th>
-                                    <th>Visits</th>
-                                    <th>% New Visits</th>
-                                    <th>Revenue</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>/index.html</td>
-                                    <td>1265</td>
-                                    <td>32.3%</td>
-                                    <td>$321.33</td>
-                                </tr>
-                                <tr>
-                                    <td>/about.html</td>
-                                    <td>261</td>
-                                    <td>33.3%</td>
-                                    <td>$234.12</td>
-                                </tr>
-                                <tr>
-                                    <td>/sales.html</td>
-                                    <td>665</td>
-                                    <td>21.3%</td>
-                                    <td>$16.34</td>
-                                </tr>
-                                <tr>
-                                    <td>/blog.html</td>
-                                    <td>9516</td>
-                                    <td>89.3%</td>
-                                    <td>$1644.43</td>
-                                </tr>
-                                <tr>
-                                    <td>/404.html</td>
-                                    <td>23</td>
-                                    <td>34.3%</td>
-                                    <td>$23.52</td>
-                                </tr>
-                                <tr>
-                                    <td>/services.html</td>
-                                    <td>421</td>
-                                    <td>60.3%</td>
-                                    <td>$724.32</td>
-                                </tr>
-                                <tr>
-                                    <td>/blog/post.html</td>
-                                    <td>1233</td>
-                                    <td>93.2%</td>
-                                    <td>$126.34</td>
-                                </tr>
-                                </tbody>
-                            </table>-->
-                        
+
+                    
 <?php 
 $db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("ora_d8c0b", "a33056145", $db);
+$db_conn = OCILogon("", "", $db);
 
 
 
@@ -270,10 +215,9 @@ function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL com
 
 }
 
-
 function printResult($result) { //prints results from a select statement
-	echo "<table class='table table-hover table-striped'>";
-	echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Average Discount</th></tr></thead>";
+	echo "<table class='table table-hover'>";
+	echo "<thead><tr><th>Client Name</th><th>Phone No</th></tr></thead>";
 	echo "<tbody>";
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 		$number = count($row);
@@ -290,10 +234,54 @@ function printResult($result) { //prints results from a select statement
 
 if (db_conn) {
   	echo "Successfully connected to Oracle"."<br>";
-        $result = executePlainSQL("select e.name, d.eid, AVG(d.amount) from employee e, discounts d where e.eid = d.eid group by e.name, d.eid");
-
-	printResult($result);
+	if(($_POST["allOrSearch"])=="allChecked"){
 	
+	$result = executePlainSQL("select Name,pNum from Client");
+	printResult($result);
+
+	}
+
+	else{
+	
+	if(isset($_POST["nameChecked"]) || isset($_POST["numberChecked"])){
+		if(isset($_POST["nameChecked"]) && isset($_POST["numberChecked"])){
+			$name = $_POST["filterName"];
+			$number = $_POST["filterNo"];
+			$result = executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."') and pNum = '".$number."'");
+			printResult($result);
+		}
+		else if(isset($_POST["nameChecked"])){
+			$name = $_POST["filterName"];
+			$result = executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."')");
+			printResult($result);
+		}
+		else{
+
+			$number = $_POST["filterNo"];
+			$result = executePlainSQL("select Name,pNum from Client where pNum='%".$number."%'");
+			printResult($result);
+		}
+	}
+
+	}
+	/*if(isset( $_POST["clientSearchRadioAll"])){ 
+
+	$result = executePlainSQL("select Name,pNum from Client");
+	printResult($result);}
+	else{
+		
+	if(isset( $_POST["clientSearchRadioName"])){ 
+
+	$result = executePlainSQL("select Name from Client");
+	printResult($result);}
+
+	if(isset( $_POST["clientSearchRadioNumber"])){ 
+
+	$result = executePlainSQL("select pNum from Client");
+	printResult($result);}
+	}*/	
+
+
   	OCILogoff($db_conn);
 } else {
   	$err = OCIError();
@@ -301,13 +289,12 @@ if (db_conn) {
 }
 ?>
 
-			</div>
-                    </div>
 
-                    <!-- /.row -->
+			</div>
+                </div>
 
                 </div>
-                <!-- /.container-fluid -->
+                <!-- /.row -->
 
             </div>
             <!-- /.container-fluid -->

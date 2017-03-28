@@ -2,7 +2,8 @@
 
 //require_once("db.php");
 $db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn=OCILogon("ora_z0p8", "a31358120", $db);
+$db_conn=OCILogon("ora_t9d9", "a30583132", $db);
+// TODO REMOVE USERNAME AND PASSWORD BEFORE PUSH
 
 if (!$db_conn) {
         $err = OCIError();
