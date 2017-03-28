@@ -153,7 +153,7 @@
                         <form action="manageDiscounts.php" method="post">
                             <div class="input-group">
                                 <span class="input-group-addon">Authorization Code</span>
-                                <input id="managerAuth" type="text" class="form-control" name="auth">
+                                <input id="managerAuth" type="number" class="form-control" name="auth">
                             </div>
                             <hr>
                             <h3>Get Discount Reports</h3>
@@ -162,12 +162,34 @@
                                     Run reports grouped by minimum or maximum average discount rates.
                                 </li>
                             </ol>
+                            
                             <div class="checkbox">
-                                <label><input name="discountsRadio" checked="checked" type="radio" value="min"> Minimum average discount</label>
+                                <label><input name="discount" checked="checked" type="radio" value="avg"> Average per Manager</label>
                             </div>
                             <div class="checkbox">
-                                <label><input name="discountsRadio" type="radio" value="max"> Maximum average discount</label>
+                                <label><input name="discount" type="radio" value="max"> Max Discount per Manager</label>
                             </div>
+                            <div class="checkbox">
+                                <label><input name="discount" type="radio" value="min"> Min Discount per Manager</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input name="discount" type="radio" value="sum"> Sum of Discounts per Manager</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input name="discount" type="radio" value="count"> Number of Discounts per Manager</label>
+                            </div>
+                            <ol class="breadcrumb">
+                                <li class="active">
+                                    Optional: Additional filter to above query
+                                </li>
+                            </ol>
+                            <div class="checkbox">
+                                <label><input name="extra" type="radio" value="maximum"> Maximum </label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input name="extra" type="radio" value="minimum"> Minimum</label>
+                            </div>
+                            
                             <br>
                             <hr>
                             <div class="form-group" align="right">
@@ -177,9 +199,9 @@
                     </div>
                     <div class="col-lg-6">
                         <h1 class="page-header">Results</h1>
-                        <div id="authError" class="alert alert-danger" style="display:none;">
+                        <!--<div id="authError" class="alert alert-danger" style="display:none;">
                             <strong>ERROR</strong> Invalid manager authorization code
-                        </div>
+                        </div>-->
                         <div id="resultsTable" class="table-responsive">
                             <!--<table class="table table-hover table-striped">
                                 <thead>
@@ -275,24 +297,101 @@ function printResult($result) { //prints results from a select statement
 	echo "<table class='table table-hover table-striped'>";
 	echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Average Discount</th></tr></thead>";
 	echo "<tbody>";
+	$var1;
+	$value;
+	$extraRow;
+	if(isset($_POST["extra"])){
+		$var1 = $_POST["extra"];
+		if($var1 == "maximum")
+			$value = -1; 
+		elseif($var1 == "minimum")
+			$value = PHP_INT_MAX;
+	
+		
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		$number = count($row);
+		/*$number = count($row);
+		
 		echo "<tr>";
 		for($i = 0; $i < $number; $i++)
 			echo "<td>".$row[$i]."</td>";
-	
-		echo "</tr>";
+		
+		echo "</tr>";*/
+
+		if($var1 == "maximum"){
+			if($row[2] > $value){
+				$extraRow = $row;
+				$value = $row[2];
+				}
+				
+		}
+		elseif($var1 == "minimum"){
+			if($row[2] < $value){
+				$extraRow = $row;
+				$value = $row[2];
+				}
+		}
+			
+		
+	}
+	printRow($extraRow);
+	}
+	else{
+		while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+			printRow($row);
+		}
 	}
 	echo "</tbody>";
 	echo "</table>";
 
 }
 
-if (db_conn) {
-  	echo "Successfully connected to Oracle"."<br>";
-        $result = executePlainSQL("select e.name, d.eid, AVG(d.amount) from employee e, discounts d where e.eid = d.eid group by e.name, d.eid");
+function printRow($row){
+	$number = count($row);
+		
+	echo "<tr>";
+	for($i = 0; $i < $number; $i++)
+		echo "<td>".$row[$i]."</td>";
+		
+	echo "</tr>";
+}
 
-	printResult($result);
+function checkCode(){
+	
+	$correctCode = false;
+	
+	$result = executePlainSQL("select overridecode from manager");
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		if($row[0] == $_POST["auth"]){
+			$correctCode = true;
+			break;
+		}
+	}
+	return $correctCode;
+}
+
+if (db_conn) {
+  	if($_POST["auth"] ){
+  		if(checkCode()){  	
+  			if(isset($_POST["discount"])){
+  				$var1 = $_POST["discount"];
+				$result = executePlainSQL("select e.name, d.eid, ".$var1."(d.amount) from employee e, discounts d where e.eid = d.eid group by e.name, d.eid");
+				printResult($result);
+			}
+		}
+		else{
+			 echo "<div id='authError' class='alert alert-danger'>";
+        	 echo  "<strong>ERROR</strong> Invalid manager authorization code";
+       		 echo "</div>";
+			
+		}
+	}
+	else{
+		echo "<div id='authError' class='alert alert-danger'>";
+        //echo  "<strong>ERROR</strong> Invalid manager authorization code";
+        echo "Please enter the manager authorization code";
+        echo "</div>";
+
+	}
 	
   	OCILogoff($db_conn);
 } else {
