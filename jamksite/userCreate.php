@@ -131,7 +131,8 @@
                                     echo "<strong>Please select a valid date range.</strong>";
                                     echo "</div>";
                                 } else {
-                                    // add client to client table
+                                    // TODO: add client to client table only if client doesn't already exist
+                                    // also need to check if their current details match new details...
                                     $CreditCardNumber = $_POST['cc-num'];
                                     $PhoneNumber = $_POST['client-phone'];
                                     $ClientName = $_POST['client-name'];
@@ -142,7 +143,7 @@
 
                                     $result = oci_execute($stid);
 
-                                    // if unique constraint violated display error message
+                                    // if constraint violated display error message
                                     if (!$result) {
                                         echo '<div class="alert alert-danger alert-dismissable">';
                                         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -155,7 +156,8 @@
                                         // check if there are any available rooms of the indicated room type
                                         $RoomType = $_POST['room-type'];
 
-                                        $sql = "SELECT MAX(rm.rNum) AS MAXRNUM FROM Room rm, Reservation rsv WHERE rm.rType='$RoomType' AND rm.rNum = rsv.rNum AND (rsv.fromDate > '$ToDate' OR rsv.toDate < '$FromDate')";
+                                        // TODO: fix this query does not work when a room is booked out twice...
+                                        $sql = "SELECT MAX(rm.rNum) AS MAXRNUM FROM Room rm, Reservation rsv WHERE rm.rType='$RoomType' AND rm.rNum = rsv.rNum AND (rsv.fromDate >= '$ToDate' OR rsv.toDate <= '$FromDate')";
                                         $stid = oci_parse($db_conn, $sql);
                                         oci_execute($stid);
 
@@ -240,58 +242,62 @@
                         </div>
                         <div class="col-lg-6">
                             <h1 class="page-header">Confirmation</h1>
-                        </div>
-                        <br>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Confirmation Number</th>
-                                        <th>Name</th>
-                                        <th>From</th>
-                                        <th>To</th>
-                                        <th>Room Type</th>
-                                        <th>Contact Number</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <?php 
-                                    // TODO: Only display this if the reservation was inserted into the database
-                                        echo "<td>$ConfirmationNumber</td>";
-                                        echo "<td>$ClientName</td>"; 
-                                        echo "<td>$FromDate</td>";
-                                        echo "<td>$ToDate</td>";
-                                        echo "<td>$RoomType</td>";
-                                        echo "<td>$PhoneNumber</td>";
-                                        ?>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div align="right">
-                                <a href="#"><small>Email this confirmation</small></a><br>
-                                <a href="#"><small>Print this confirmation</small></a>
+                            <br>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Confirmation Number</th>
+                                            <th>Name</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Room Type</th>
+                                            <th>Contact Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <?php 
+                                            if ($RoomNumber) {
+                                                echo "<td>$ConfirmationNumber</td>";
+                                                echo "<td>$ClientName</td>"; 
+                                                echo "<td>$FromDate</td>";
+                                                echo "<td>$ToDate</td>";
+                                                echo "<td>$RoomType</td>";
+                                                echo "<td>$PhoneNumber</td>";
+                                            }
+                                            ?>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div align="right">
+                                    <a href="#"><small>Email this confirmation</small></a><br>
+                                    <a href="#"><small>Print this confirmation</small></a>
+                                </div>
                             </div>
                         </div>
+
                     </div>
+                    <!-- /.row -->
 
                 </div>
-                <!-- /.row -->
+                <!-- /.container-fluid -->
 
             </div>
-            <!-- /.container-fluid -->
+            <!-- /#page-wrapper -->
 
         </div>
-        <!-- /#page-wrapper -->
+        <!-- /#wrapper -->
 
-    </div>
-    <!-- /#wrapper -->
+        <!-- jQuery -->
+        <script src="js/jquery.js"></script>
 
-    <!-- Bootstrap Core JavaScript -->
-    <!-- <script src="js/bootstrap.min.js"></script> -->
+        <!-- Bootstrap Core JavaScript -->
+        <script src="js/bootstrap.min.js"></script>
 
-    <!-- <script src="js/main.js"></script> -->
+        <script src="js/main.js"></script>
 
-</body>
+    </body>
 
-</html>
+    </html>
