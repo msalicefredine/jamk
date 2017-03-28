@@ -88,7 +88,7 @@
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
                     <li>
-                        <a href="userCreate.html"><i class="fa fa-fw fa-bookmark" aria-hidden="true"></i> Create Reservation</a>
+                        <a href="userCreate.php"><i class="fa fa-fw fa-bookmark" aria-hidden="true"></i> Create Reservation</a>
                     </li>
                     <li class="active">
                         <a href="userModify.php"><i class="fa fa-fw fa-ellipsis-h"></i> Modify Reservation</a>
@@ -114,7 +114,7 @@
                         include('db.php');
 
 $retrievedReservation = null;
-$roomTypes = DB::getInstance()->executePlainSQL("select rtype from Roomtype");
+// $roomTypes = DB::getInstance()->executePlainSQL("select rtype from Roomtype");
 
 if ($db_conn) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -127,8 +127,6 @@ if ($db_conn) {
      			$confNum = $_POST['conf-num'];
     			$result = DB::getInstance()->executePlainSQL("select * from modify_reservation
     			         where ccNum=".$ccNum." and confNo=".$confNum);
-    		    echo "select * from modify_reservation
-    			         where ccNum=".$ccNum." and confNo=".$confNum;
     			$retrievedReservation = OCI_Fetch_Array($result, OCI_BOTH);
             }
             unset($_POST['userRetrieveSubmit']);

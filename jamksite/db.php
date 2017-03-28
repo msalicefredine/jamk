@@ -49,7 +49,26 @@ class DB {
 	}
 	return $statement;
 
-}
+	}
+
+	function printResult($result) { //prints results from a select statement
+	echo "<table class='table table-hover'>";
+	echo "<thead><tr><th>Client Name</th><th>Phone No</th></tr></thead>";
+	echo "<tbody>";
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		$number = count($row);
+		echo "<tr>";
+		for($i = 0; $i < $number; $i++)
+			echo "<td>".$row[$i]."</td>";
+
+		echo "</tr>";
+	}
+	echo "</tbody>";
+	echo "</table>";
+
+	}
+
+
 
 }
 

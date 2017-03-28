@@ -149,7 +149,7 @@
                             </h1>
                             <ol class="breadcrumb">
                                 <li class="active">
-                                    TODO - words
+                                    Search for a room or a floor of rooms to see the room number joined with its room type.
                                 </li>
                             </ol>
 
@@ -232,70 +232,21 @@
                                     </tr>
                                     </tbody>
                                 </table>-->
-                        
-<?php 
-$db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("", "", $db);
 
+<?php
+include('db.php');
 
-
-
-
-function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
-	//echo "<br>running ".$cmdstr."<br>";
-	global $db_conn, $success;
-	$statement = OCIParse($db_conn, $cmdstr); //There is a set of comments at the end of the file that describe some of the OCI specific functions and how they work
-
-	if (!$statement) {
-		echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-		$e = OCI_Error($db_conn); // For OCIParse errors pass the       
-		// connection handle
-		echo htmlentities($e['message']);
-		$success = False;
-	}
-
-	$r = OCIExecute($statement, OCI_DEFAULT);
-	if (!$r) {
-		echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-		$e = oci_error($statement); // For OCIExecute errors pass the statementhandle
-		echo htmlentities($e['message']);
-		$success = False;
-	} else {
-
-	}
-	return $statement;
-
-}
-
-function printResult($result) { //prints results from a select statement
-	echo "<table class='table table-hover table-striped'>";
-	echo "<thead><tr><th>Room No.</th><th>Room Type</th></tr></thead>";
-
-	echo "<tbody>";
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		$number = count($row);
-		echo "<tr>";
-		for($i = 0; $i < $number; $i++)
-			echo "<td>".$row[$i]."</td>";
-	
-		echo "</tr>";
-	}
-	echo "</tbody>";
-	echo "</table>";
-
-}
-
-if (db_conn) {
+if ($db_conn) {
   	echo "Successfully connected to Oracle"."<br>";
-	
+
 	if($_POST["roomSearchRadio"]=="floor"){
-		$var1 = $_POST["floorValue"];	
+		$var1 = $_POST["floorValue"];
 		$minfloor = $var1 * 100 - 1;
 		$maxfloor = ($var1 + 1) * 100;
-		$result = executePlainSQL("select * from room where rnum >". $minfloor." and rnum<".$maxfloor);
-		printResult($result);
+		$result = DB::getInstance()->executePlainSQL("select * from room where rnum >". $minfloor." and rnum<".$maxfloor);
+		DB::getInstance()->printResult($result);
 		//echo $floorNoString;
-	}	
+	}
 
 	//if(isset( $_POST["roomSearchRadioNumber"])){
     if($_POST["roomSearchRadio"]=="roomNumber"){
@@ -306,15 +257,20 @@ if (db_conn) {
         } else {
             $roomstring = "$var2";
             $querystring = "select * from room where rnum = " . $roomstring;
-            $result = executePlainSQL($querystring);
-            printResult($result);
+            $result = DB::getInstance()->executePlainSQL($querystring);
+            DB::getInstance()->printResult($result);
         }
 	}
 
   	OCILogoff($db_conn);
 } else {
-  	$err = OCIError();
-  	echo "Oracle Connect Error " . $err['message'];
+  	echo '<div class="alert alert-danger alert-dismissable">';
+	echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+	echo '<strong>Oracle Connect Error! </strong>';
+		$e = OCI_Error(); // For OCIParse errors pass the
+		// connection handle
+		echo htmlentities($e['message']);
+	echo "</div>";
 }
 ?>
 			</div>

@@ -231,58 +231,10 @@
                                 </tr>
                                 </tbody>
                             </table> -->
-<?php 
-$db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("", "", $db);
+<?php
+include('db.php');
 
-
-
-
-
-function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
-	//echo "<br>running ".$cmdstr."<br>";
-	global $db_conn, $success;
-	$statement = OCIParse($db_conn, $cmdstr); //There is a set of comments at the end of the file that describe some of the OCI specific functions and how they work
-
-	if (!$statement) {
-		echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-		$e = OCI_Error($db_conn); // For OCIParse errors pass the       
-		// connection handle
-		echo htmlentities($e['message']);
-		$success = False;
-	}
-
-	$r = OCIExecute($statement, OCI_DEFAULT);
-	if (!$r) {
-		echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-		$e = oci_error($statement); // For OCIExecute errors pass the statementhandle
-		echo htmlentities($e['message']);
-		$success = False;
-	} else {
-
-	}
-	return $statement;
-
-}
-
-function printResult($result) { //prints results from a select statement
-	echo "<table class='table table-hover table-striped'>";
-	echo "<thead><tr><th>Credit Card</th><th>Phone No.</th><th>Name</th><th>Room Number</th></tr></thead>";
-	echo "<tbody>";
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		$number = count($row);
-		echo "<tr>";
-		for($i = 0; $i < $number; $i++)
-			echo "<td>".$row[$i]."</td>";
-	
-		echo "</tr>";
-	}
-	echo "</tbody>";
-	echo "</table>";
-
-}
-
-if (db_conn) {
+if ($db_conn) {
   	echo "Successfully connected to Oracle"."<br>";
 	$roomtypes = "";
 	$count = 0;
@@ -306,7 +258,7 @@ if (db_conn) {
 			$count--;
 			$roomtypes = $roomtypes.",";}
 	}
-	
+
 	if(isset($_POST["clientRoomCheckbox2"])){
 		$var2 = $_POST["clientRoomCheckbox2"];
 		//$roomtypes = $roomtypes.$var2;
@@ -315,7 +267,7 @@ if (db_conn) {
 			$count--;
 			$roomtypes = $roomtypes.",";}
 	}
-	
+
 	if(isset($_POST["clientRoomCheckbox3"])){
 		$var3 = $_POST["clientRoomCheckbox3"];
 		//$roomtypes = $roomtypes.$var3;
@@ -324,7 +276,7 @@ if (db_conn) {
 			$count--;
 			$roomtypes = $roomtypes.",";}
 	}
-	
+
 	if(isset($_POST["clientRoomCheckbox4"])){
 		$var4 = $_POST["clientRoomCheckbox4"];
 		//$roomtypes = $roomtypes.$var4;
@@ -337,13 +289,18 @@ if (db_conn) {
 	echo $roomtypes;
 	if($initialcount > 0){
 	    $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";
-        $result = executePlainSQL($querystring);
-	    printResult($result);
+        $result = DB::getInstance()->executePlainSQL($querystring);
+	    DB::getInstance()->printResult($result);
 	}
   	OCILogoff($db_conn);
 } else {
-  	$err = OCIError();
-  	echo "Oracle Connect Error " . $err['message'];
+  	echo '<div class="alert alert-danger alert-dismissable">';
+	echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+	echo '<strong>Oracle Connect Error! </strong>';
+		$e = OCI_Error(); // For OCIParse errors pass the
+		// connection handle
+		echo htmlentities($e['message']);
+	echo "</div>";
 }
 ?>
                         </div>
