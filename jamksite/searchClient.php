@@ -17,9 +17,6 @@
     <!-- Custom CSS -->
     <link href="css/sb-admin.css" rel="stylesheet">
 
-    <!-- Morris Charts CSS -->
-    <link href="css/plugins/morris.css" rel="stylesheet">
-
     <!-- JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
@@ -160,9 +157,15 @@
                                 <label><input type="radio" name="clientSearchRadioName" value="name">Name</label><br>
                                 <label><input type="radio" name="clientSearchRadioNumber" value="phone">Phone Number</label>
                             </div>-->
-                            <br>
-                            <h4>Filter by...</h4>
-			    <strong><input type="radio" name="allChecked"> Get All</strong><br><br>	
+                            <h4>Find clients by...</h4>
+
+
+
+                            <select name="allOrSearch">
+                                <option selected value="allChecked">Get All</option>
+                                <option value="searchByChecked">Search By...</option>
+                            </select><br><br>
+                            <h4>Search by options</h4>
                             <strong><input type="radio" name="nameChecked"> Client Name: </strong>
                             <input type="text" id="client-name" name ="filterName" placeholder="Eg. John"><br><br>
                             <strong><input type="radio" name="numberChecked"> Phone Number: </strong>
@@ -170,65 +173,13 @@
                             <div class="form-group" align="right">
                                 <button type="submit" class="btn btn-primary btn-block" id="clientSearchSubmit">Search</button>
                             </div>
+
                         </form>
                     </div>
                     <div class="col-lg-6">
                     <h1 class="page-header">Results</h1>
                         <div id="resultsTable" class="table-responsive">
-                            <!--<table class="table table-hover">
-                                <thead>
-                                <tr>
-                                    <th>Page</th>
-                                    <th>Visits</th>
-                                    <th>% New Visits</th>
-                                    <th>Revenue</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>/index.html</td>
-                                    <td>1265</td>
-                                    <td>32.3%</td>
-                                    <td>$321.33</td>
-                                </tr>
-                                <tr>
-                                    <td>/about.html</td>
-                                    <td>261</td>
-                                    <td>33.3%</td>
-                                    <td>$234.12</td>
-                                </tr>
-                                <tr>
-                                    <td>/sales.html</td>
-                                    <td>665</td>
-                                    <td>21.3%</td>
-                                    <td>$16.34</td>
-                                </tr>
-                                <tr>
-                                    <td>/blog.html</td>
-                                    <td>9516</td>
-                                    <td>89.3%</td>
-                                    <td>$1644.43</td>
-                                </tr>
-                                <tr>
-                                    <td>/404.html</td>
-                                    <td>23</td>
-                                    <td>34.3%</td>
-                                    <td>$23.52</td>
-                                </tr>
-                                <tr>
-                                    <td>/services.html</td>
-                                    <td>421</td>
-                                    <td>60.3%</td>
-                                    <td>$724.32</td>
-                                </tr>
-                                <tr>
-                                    <td>/blog/post.html</td>
-                                    <td>1233</td>
-                                    <td>93.2%</td>
-                                    <td>$126.34</td>
-                                </tr>
-                                </tbody>
-                            </table>-->
+
                     
 <?php 
 $db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
@@ -283,7 +234,7 @@ function printResult($result) { //prints results from a select statement
 
 if (db_conn) {
   	echo "Successfully connected to Oracle"."<br>";
-	if(isset($_POST["allChecked"])){
+	if(($_POST["allOrSearch"])=="allChecked"){
 	
 	$result = executePlainSQL("select Name,pNum from Client");
 	printResult($result);
@@ -307,7 +258,7 @@ if (db_conn) {
 		else{
 
 			$number = $_POST["filterNo"];
-			$result = executePlainSQL("select Name,pNum from Client where pNum='".$number."'");
+			$result = executePlainSQL("select Name,pNum from Client where pNum='%".$number."%'");
 			printResult($result);
 		}
 	}

@@ -147,7 +147,7 @@
 
                         <ol class="breadcrumb">
                             <li class="active">
-                                Find clients by room type of reservation
+                                Find all clients who have stayed in all selected room types.
                             </li>
                         </ol>
                         <!--<form action="clientRoomSearch.php" method="post">
@@ -267,7 +267,7 @@ function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL com
 
 function printResult($result) { //prints results from a select statement
 	echo "<table class='table table-hover table-striped'>";
-	echo "<thead><tr><th>Credit Card</th><th>Phone No.</th><th>Name</th></tr></thead>";
+	echo "<thead><tr><th>Credit Card</th><th>Phone No.</th><th>Name</th><th>Room Number</th></tr></thead>";
 	echo "<tbody>";
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 		$number = count($row);
@@ -336,8 +336,8 @@ if (db_conn) {
 
 	echo $roomtypes;
 	if($initialcount > 0){
-	    $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";	
-	    $result = executePlainSQL($querystring);
+	    $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";
+        $result = executePlainSQL($querystring);
 	    printResult($result);
 	}
   	OCILogoff($db_conn);

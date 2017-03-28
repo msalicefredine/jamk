@@ -157,7 +157,7 @@
 
                                 <div class="form-group">
                                     <div class="radio" id="clientSearchRadio">
-                                        <input type="radio" name="roomSearchRadioFloor" value="floor">
+                                        <input type="radio" name="roomSearchRadio" value="floor">
                                         <strong>Floor:</strong>
                                         <select class="form-control" type="number" id="floorNumValue" name="floorValue">
                                             <option value="1">1</option>
@@ -165,7 +165,7 @@
 					    <option value="3">3</option>
                                         </select>
 					<br>
-                                        <input type="radio" name="roomSearchRadioNumber" value="roomNumber">
+                                        <input type="radio" name="roomSearchRadio" value="roomNumber">
                                         <strong>Or room number:</strong>
                                         <input type="text" name="searchbyRoom" class="form-control" placeholder="Eg. 123" id="roomNumValue">
                                     </div>
@@ -288,7 +288,7 @@ function printResult($result) { //prints results from a select statement
 if (db_conn) {
   	echo "Successfully connected to Oracle"."<br>";
 	
-	if(isset( $_POST["roomSearchRadioFloor"])){
+	if($_POST["roomSearchRadio"]=="floor"){
 		$var1 = $_POST["floorValue"];	
 		$minfloor = $var1 * 100 - 1;
 		$maxfloor = ($var1 + 1) * 100;
@@ -297,15 +297,19 @@ if (db_conn) {
 		//echo $floorNoString;
 	}	
 
-	if(isset( $_POST["roomSearchRadioNumber"])){ 
+	//if(isset( $_POST["roomSearchRadioNumber"])){
+    if($_POST["roomSearchRadio"]=="roomNumber"){
 		$var2 =  $_POST["searchbyRoom"];
-		$roomstring = "$var2";
-		$querystring =  "select * from room where rnum = ".$roomstring;
-	$result = executePlainSQL($querystring);
-	printResult($result);
+		if ($var2 == "") {
+//            echo "ERROR: Please enter room number";
+            echo "<div id='authError' class='alert alert-danger'><strong>ERROR</strong> Please enter room number</div>";
+        } else {
+            $roomstring = "$var2";
+            $querystring = "select * from room where rnum = " . $roomstring;
+            $result = executePlainSQL($querystring);
+            printResult($result);
+        }
 	}
-	
-
 
   	OCILogoff($db_conn);
 } else {
