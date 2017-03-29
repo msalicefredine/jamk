@@ -36,9 +36,9 @@ class DB {
 	$r = OCIExecute($statement, OCI_DEFAULT);
 	if (!$r) {
 	// TODO: Update error message
-	echo '<div class="alert alert-danger alert-dismissable">';
-	echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-	echo '<strong>Database Error! </strong>';
+		echo '<div class="alert alert-danger alert-dismissable">';
+		echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+		echo '<strong>Database Error! </strong>';
 		echo "Cannot execute the following command: " . $cmdstr . "<br>";
 		$e = oci_error($statement); // For OCIExecute errors pass the statementhandle
 		echo htmlentities($e['message']);
@@ -66,6 +66,20 @@ class DB {
 	echo "</tbody>";
 	echo "</table>";
 
+	}
+
+	// Validates a manager authorization code
+	function checkManagerCode($code) {
+		$correctCode = false;
+
+	$result = DB::getInstance()->executePlainSQL("select overridecode from manager");
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		if($row[0] == $code){
+			$correctCode = true;
+			break;
+		}
+	}
+		return $correctCode;
 	}
 
 

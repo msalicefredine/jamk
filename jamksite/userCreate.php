@@ -112,14 +112,16 @@
                             </h1>
 
                             <?php
-
-                            include('db.php');
-
+                            require('db.php');
                             if (!$db_conn) {
-                                $err = OCIError();
-                                echo "Oracle Connect Error " . $err['message'];
+                                 	echo '<div class="alert alert-danger alert-dismissable">';
+									echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+									echo '<strong>Oracle Connect Error! </strong>';
+									$e = OCI_Error(); // For OCIParse errors pass the
+									// connection handle
+									echo htmlentities($e['message']);
+									echo "</div>";
                             }
-
                             if ($_SERVER['REQUEST_METHOD'] == "POST") {
                                  // ensure that the dates are valid
                                 $FromDate = $_POST['start-date'];
@@ -130,18 +132,20 @@
                                     echo "<strong>Please select a valid date range.</strong>";
                                     echo "</div>";
                                 } else {
-                                    // add client to client table
+                                    // TODO: add client to client table only if client doesn't already exist
+                                    // also need to check if their current details match new details...
                                     $CreditCardNumber = $_POST['cc-num'];
                                     $PhoneNumber = $_POST['client-phone'];
                                     $ClientName = $_POST['client-name'];
-
-                                    $sql = "INSERT INTO Client VALUES ($CreditCardNumber, $PhoneNumber, '$ClientName')";
-
+									$sql = "merge into client c using
+											(select ".$CreditCardNumber." ccnum, '".$ClientName."' name, ".$PhoneNumber." pnum from dual) s
+											on (c.ccnum = s.ccnum) when matched then update set c.name=s.name, c.pnum=s.pnum
+											when not matched then insert (ccnum, pnum, name) values (s.ccnum, s.pnum, s.name)";
+									// echo $sql;
                                     $stid = oci_parse($db_conn, $sql);
-
                                     $result = oci_execute($stid);
-
-                                    // if unique constraint violated display error message
+                                    OCICOMMIT($db_conn);
+                                    // if constraint violated display error message
                                     if (!$result) {
                                         echo '<div class="alert alert-danger alert-dismissable">';
                                         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -153,26 +157,23 @@
                                     } else {
                                         // check if there are any available rooms of the indicated room type
                                         $RoomType = $_POST['room-type'];
-
-                                        $sql = "SELECT MAX(rm.rNum) AS MAXRNUM FROM Room rm, Reservation rsv WHERE rm.rType='$RoomType' AND rm.rNum = rsv.rNum AND (rsv.fromDate > '$ToDate' OR rsv.toDate < '$FromDate')";
+                                        $sql = "SELECT MAX(rNum) AS MAXRNUM FROM Room WHERE rType='".$RoomType."' AND rNum NOT IN (SELECT rNum FROM Reservation WHERE (fromDate <= '".$ToDate."' AND toDate >= '".$FromDate."'))";
+                                        // echo $sql;
                                         $stid = oci_parse($db_conn, $sql);
                                         oci_execute($stid);
-
                                         $RoomNumber = oci_fetch_array($stid);
+                                        // echo $RoomNumber;
                                         $RoomNumber = $RoomNumber['MAXRNUM'];
                                         // echo $RoomNumber;
-
                                         // if such a room is available insert reservation into reservation table
                                         if ($RoomNumber) {
-                                            $sql = "INSERT INTO Reservation (RNUM, CCNUM, FROMDATE, TODATE, STAYID) VALUES ($RoomNumber, $CreditCardNumber, '$FromDate', '$ToDate', NULL)";
+                                            $sql = "INSERT INTO Reservation (RNUM, CCNUM, FROMDATE, TODATE, STAYID) VALUES (".$RoomNumber.", ".$CreditCardNumber.", '".$FromDate."', '".$ToDate."', NULL)";
                                             $stid = oci_parse($db_conn, $sql);
                                             oci_execute($stid);
-
                                             // retrieve confirmation number to display later
-                                            $sql = "SELECT confNo FROM Reservation WHERE rNum=$RoomNumber AND fromDate='$FromDate' AND toDate='$ToDate'";
+                                            $sql = "SELECT confNo FROM Reservation WHERE rNum=".$RoomNumber." AND fromDate='".$FromDate."' AND toDate='".$ToDate."'";
                                             $stid = oci_parse($db_conn, $sql);
                                             oci_execute($stid);
-
                                             $ConfirmationNumber = oci_fetch_array($stid);
                                             $ConfirmationNumber = $ConfirmationNumber['CONFNO'];
                                             // echo $ConfirmationNumber;
@@ -186,7 +187,6 @@
                                     }
                                 }
                             }
-
                             ?>
 
                             <form action="userCreate.php" method="POST">
@@ -211,7 +211,6 @@
                                     $sql = "SELECT rType FROM RoomType";
                                     $stid = oci_parse($db_conn, $sql);
                                     oci_execute($stid);
-
                                     // display vector of roomtypes as roomtype options
                                     echo "<select id='room-type' class='form-control' name='room-type'>";
                                     echo "<option disabled selected value>Select a Room Type</option>";
@@ -239,58 +238,62 @@
                         </div>
                         <div class="col-lg-6">
                             <h1 class="page-header">Confirmation</h1>
-                        </div>
-                        <br>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Confirmation Number</th>
-                                        <th>Name</th>
-                                        <th>From</th>
-                                        <th>To</th>
-                                        <th>Room Type</th>
-                                        <th>Contact Number</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <?php
-                                    // TODO: Only display this if the reservation was inserted into the database
-                                        echo "<td>$ConfirmationNumber</td>";
-                                        echo "<td>$ClientName</td>";
-                                        echo "<td>$FromDate</td>";
-                                        echo "<td>$ToDate</td>";
-                                        echo "<td>$RoomType</td>";
-                                        echo "<td>$PhoneNumber</td>";
-                                        ?>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div align="right">
-                                <a href="#"><small>Email this confirmation</small></a><br>
-                                <a href="#"><small>Print this confirmation</small></a>
+                            <br>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Confirmation Number</th>
+                                            <th>Name</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Room Type</th>
+                                            <th>Contact Number</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <?php
+                                            if ($RoomNumber) {
+                                                echo "<td>$ConfirmationNumber</td>";
+                                                echo "<td>$ClientName</td>";
+                                                echo "<td>$FromDate</td>";
+                                                echo "<td>$ToDate</td>";
+                                                echo "<td>$RoomType</td>";
+                                                echo "<td>$PhoneNumber</td>";
+                                            }
+                                            ?>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div align="right">
+                                    <a href="#"><small>Email this confirmation</small></a><br>
+                                    <a href="#"><small>Print this confirmation</small></a>
+                                </div>
                             </div>
                         </div>
+
                     </div>
+                    <!-- /.row -->
 
                 </div>
-                <!-- /.row -->
+                <!-- /.container-fluid -->
 
             </div>
-            <!-- /.container-fluid -->
+            <!-- /#page-wrapper -->
 
         </div>
-        <!-- /#page-wrapper -->
+        <!-- /#wrapper -->
 
-    </div>
-    <!-- /#wrapper -->
+        <!-- jQuery -->
+        <script src="js/jquery.js"></script>
 
-    <!-- Bootstrap Core JavaScript -->
-    <!-- <script src="js/bootstrap.min.js"></script> -->
+        <!-- Bootstrap Core JavaScript -->
+        <script src="js/bootstrap.min.js"></script>
 
-    <!-- <script src="js/main.js"></script> -->
+        <script src="js/main.js"></script>
 
-</body>
+    </body>
 
-</html>
+    </html>
