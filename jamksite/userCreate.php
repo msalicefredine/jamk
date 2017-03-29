@@ -155,14 +155,14 @@
                                         $RoomType = $_POST['room-type'];
 
                                         $sql = "SELECT MAX(rNum) AS MAXRNUM FROM Room WHERE rType='$RoomType' AND rNum NOT IN (SELECT rNum FROM Reservation WHERE (fromDate <= '$ToDate' AND toDate >= '$FromDate'))";
-                                        echo $sql;
+                                        // echo $sql;
                                         $stid = oci_parse($db_conn, $sql);
                                         oci_execute($stid);
 
                                         $RoomNumber = oci_fetch_array($stid);
-                                        echo $RoomNumber;
+                                        // echo $RoomNumber;
                                         $RoomNumber = $RoomNumber['MAXRNUM'];
-                                        echo $RoomNumber;
+                                        // echo $RoomNumber;
 
                                         // if such a room is available insert reservation into reservation table
                                         if ($RoomNumber) {
