@@ -114,7 +114,7 @@
                             <?php
 
                             $db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-                            $db_conn=OCILogon("ora_z0p8", "a31358120", $db);
+                            $db_conn=OCILogon("ora_r8y8", "a21468137", $db);
 
                             if (!$db_conn) {
                                 $err = OCIError();
@@ -124,7 +124,7 @@
                             if ($_SERVER['REQUEST_METHOD'] == "POST") {
                                  // ensure that the dates are valid
                                 $FromDate = $_POST['start-date'];
-                                $ToDate = $_POST['end-date']; 
+                                $ToDate = $_POST['end-date'];
                                 if ($FromDate > $ToDate) {
                                     echo "<div class='alert alert-danger alert-dismissable'>";
                                     echo "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>";
@@ -137,9 +137,24 @@
                                     $PhoneNumber = $_POST['client-phone'];
                                     $ClientName = $_POST['client-name'];
 
-                                    $sql = "INSERT INTO Client VALUES ($CreditCardNumber, $PhoneNumber, '$ClientName')";
+                                    // $sql = "INSERT INTO Client VALUES ($CreditCardNumber, $PhoneNumber, '$ClientName')";
+									/*$sql = "MERGE INTO Client c USING Client s on (c.ccnum=s.ccnum)
+											WHEN MATCHED THEN UPDATE SET c.pnum=".$PhoneNumber.", c.name=".$ClientName."
+											WHEN NOT MATCHED THEN INSERT INTO Client values (".$CreditCardNumber.",".$PhoneNumber.",".$ClientName.")";*/
+									$sql = "merge into client c using
+											(select ".$CreditCardNumber." ccnum, '".$ClientName."' name, ".$PhoneNumber." pnum from dual) s
+											on (c.ccnum = s.ccnum) when matched then update set c.name=s.name, c.pnum=s.pnum
+											when not matched then insert (ccnum, pnum, name) values (s.ccnum, s.pnum, s.name)";
+									echo $sql;
+                                    /*
+                                    MERGE INTO mytable d
+USING (SELECT 1 id, 'x' name from dual) s
+ON (d.id = s.id)
+WHEN MATCHED THEN UPDATE SET d.name = s.name
+WHEN NOT MATCHED THEN INSERT (id, name) VALUES (s.id, s.name);*/
                                     $stid = oci_parse($db_conn, $sql);
                                     $result = oci_execute($stid);
+                                    OCICOMMIT($db_conn);
 
                                     // if constraint violated display error message
                                     if (!$result) {
@@ -154,7 +169,7 @@
                                         // check if there are any available rooms of the indicated room type
                                         $RoomType = $_POST['room-type'];
 
-                                        $sql = "SELECT MAX(rNum) AS MAXRNUM FROM Room WHERE rType='$RoomType' AND rNum NOT IN (SELECT rNum FROM Reservation WHERE (fromDate <= '$ToDate' AND toDate >= '$FromDate'))";
+                                        $sql = "SELECT MAX(rNum) AS MAXRNUM FROM Room WHERE rType='".$RoomType."' AND rNum NOT IN (SELECT rNum FROM Reservation WHERE (fromDate <= '".$ToDate."' AND toDate >= '".$FromDate."'))";
                                         // echo $sql;
                                         $stid = oci_parse($db_conn, $sql);
                                         oci_execute($stid);
@@ -166,12 +181,12 @@
 
                                         // if such a room is available insert reservation into reservation table
                                         if ($RoomNumber) {
-                                            $sql = "INSERT INTO Reservation (RNUM, CCNUM, FROMDATE, TODATE, STAYID) VALUES ($RoomNumber, $CreditCardNumber, '$FromDate', '$ToDate', NULL)";
+                                            $sql = "INSERT INTO Reservation (RNUM, CCNUM, FROMDATE, TODATE, STAYID) VALUES (".$RoomNumber.", ".$CreditCardNumber.", '".$FromDate."', '".$ToDate."', NULL)";
                                             $stid = oci_parse($db_conn, $sql);
                                             oci_execute($stid);
 
                                             // retrieve confirmation number to display later
-                                            $sql = "SELECT confNo FROM Reservation WHERE rNum=$RoomNumber AND fromDate='$FromDate' AND toDate='$ToDate'";
+                                            $sql = "SELECT confNo FROM Reservation WHERE rNum=".$RoomNumber." AND fromDate='".$FromDate."' AND toDate='".$ToDate."'";
                                             $stid = oci_parse($db_conn, $sql);
                                             oci_execute($stid);
 
@@ -256,10 +271,10 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <?php 
+                                            <?php
                                             if ($RoomNumber) {
                                                 echo "<td>$ConfirmationNumber</td>";
-                                                echo "<td>$ClientName</td>"; 
+                                                echo "<td>$ClientName</td>";
                                                 echo "<td>$FromDate</td>";
                                                 echo "<td>$ToDate</td>";
                                                 echo "<td>$RoomType</td>";
