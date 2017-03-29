@@ -160,14 +160,18 @@ if ($db_conn) {
 				// Handle updated roomtype (if changed)
 				if ($rtype != $oldRtype) {
 					// If there's an available room of the new type, update it.
-					$rooms = DB::getInstance()->executePlainSQL("select * from room r inner join reservation res on r.rnum=res.rnum
-						where r.rtype='".$rtype."' and res.rnum not in
-						(select rnum from reservation where ((fromDate <= '".$endDate."') and (toDate >= '".$startDate."')))");
+					$rooms = DB::getInstance()->executePlainSQL("select * from room
+						where rtype='".$rtype."' and rnum not in
+						(select rnum from reservation where (fromDate <= '".$endDate."' and toDate >= '".$startDate."'))");
+						// WHERE rType='".$RoomType."' AND rNum NOT IN (SELECT rNum FROM Reservation WHERE (fromDate <= '".$ToDate."' AND toDate >= '".$FromDate."'))";
 					if ($rooms) {
 						// echo 'got some';
 						$room = OCI_Fetch_Array($rooms, OCI_BOTH);
 						if ($room) {
 						    // echo $room["RNUM"];
+						    // echo $confNo;
+						    /*echo "update reservation set
+							  rNum='".$room["RNUM"]."' where confNo='".$confNo."'";*/
 							$reservationResult= DB::getInstance()->executePlainSQL("update reservation set
 							  rNum='".$room["RNUM"]."' where confNo='".$confNo."'");
 						} else {
