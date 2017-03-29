@@ -138,9 +138,7 @@
                                     $ClientName = $_POST['client-name'];
 
                                     $sql = "INSERT INTO Client VALUES ($CreditCardNumber, $PhoneNumber, '$ClientName')";
-
                                     $stid = oci_parse($db_conn, $sql);
-
                                     $result = oci_execute($stid);
 
                                     // if constraint violated display error message
@@ -156,14 +154,15 @@
                                         // check if there are any available rooms of the indicated room type
                                         $RoomType = $_POST['room-type'];
 
-                                        // TODO: fix this query does not work when a room is booked out twice...
-                                        $sql = "SELECT MAX(rm.rNum) AS MAXRNUM FROM Room rm, Reservation rsv WHERE rm.rType='$RoomType' AND rm.rNum = rsv.rNum AND (rsv.fromDate >= '$ToDate' OR rsv.toDate <= '$FromDate')";
+                                        $sql = "SELECT MAX(rNum) AS MAXRNUM FROM Room WHERE rType='$RoomType' AND rNum NOT IN (SELECT rNum FROM Reservation WHERE (fromDate <= '$ToDate' AND toDate >= '$FromDate'))";
+                                        echo $sql;
                                         $stid = oci_parse($db_conn, $sql);
                                         oci_execute($stid);
 
                                         $RoomNumber = oci_fetch_array($stid);
+                                        echo $RoomNumber;
                                         $RoomNumber = $RoomNumber['MAXRNUM'];
-                                        // echo $RoomNumber;
+                                        echo $RoomNumber;
 
                                         // if such a room is available insert reservation into reservation table
                                         if ($RoomNumber) {
