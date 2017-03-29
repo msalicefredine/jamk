@@ -159,7 +159,7 @@
                             <h3>Get Discount Reports</h3>
                             <ol class="breadcrumb">
                                 <li class="active">
-                                    Run reports grouped by minimum or maximum average discount rates.
+                                    Run reports grouped by managers
                                 </li>
                             </ol>
                             
@@ -295,7 +295,17 @@ function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL com
 
 function printResult($result) { //prints results from a select statement
 	echo "<table class='table table-hover table-striped'>";
-	echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Average Discount</th></tr></thead>";
+	$var1 = $_POST["discount"];
+	if($var1 == "avg")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Average Discount</th></tr></thead>";
+	elseif ($var1 == "max")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Maximum Discount</th></tr></thead>";
+	elseif ($var1 == "min")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Minimum Discount</th></tr></thead>";
+	elseif ($var1 == "sum")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Sum of Discounts</th></tr></thead>";
+	elseif ($var1 == "count")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Number of Discounts</th></tr></thead>";
 	echo "<tbody>";
 	$var1;
 	$value;
