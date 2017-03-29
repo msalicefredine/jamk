@@ -114,7 +114,7 @@
                         include('db.php');
 
 $retrievedReservation = null;
-// $roomTypes = DB::getInstance()->executePlainSQL("select rtype from Roomtype");
+$roomTypes = DB::getInstance()->executePlainSQL("select rtype from Roomtype");
 
 if ($db_conn) {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -161,8 +161,8 @@ if ($db_conn) {
 				if ($rtype != $oldRtype) {
 					// If there's an available room of the new type, update it.
 					$rooms = DB::getInstance()->executePlainSQL("select * from room r inner join reservation res on r.rnum=res.rnum
-						where r.rtype='".$rtype."' and not
-						((res.fromDate <= '".$endDate."') and (res.toDate >= '".$startDate."'))");
+						where r.rtype='".$rtype."' and res.rnum not in
+						(select rnum from reservation where ((fromDate <= '".$endDate."') and (toDate >= '".$startDate."')))");
 					if ($rooms) {
 						// echo 'got some';
 						$room = OCI_Fetch_Array($rooms, OCI_BOTH);

@@ -126,3 +126,5 @@ insert into discounts values (10,6,20);
 insert into discounts values (10,15,10);
 insert into discounts values (12,9,20);
 insert into discounts values (12,13,5);
+
+commit;
