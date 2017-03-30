@@ -205,7 +205,30 @@
                                 		echo '</table>';
                             			echo '</div>';
                                     } else {
-                                        echo "Success!";
+                                        echo '<div class="alert alert-success alert-dismissable">';
+                                        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+                                        echo '<strong>Successfully deleted! </strong>';
+                                        echo '<h3>Remaining Room Types</h3>';
+                            			echo '<div id="resultsTable" class="table-responsive">';
+                                		echo '<table class="table table-hover table-striped">';
+                                        echo "<thead>";
+                                        echo "<tr>";
+                                        echo "<th>Room Type</th>";
+                                        echo "<th>Bed Type</th>";
+                                        echo "<th>Number of Beds</th>";
+                                    	echo "<th>Price</th>";
+                                        echo "</tr>";
+                                        echo "</thead>";
+                                        echo "<tbody>";;
+                                        $sql = "SELECT * FROM Roomtype";
+                                        $stid = oci_parse($db_conn, $sql);
+                                        oci_execute($stid);
+                                        while($row = oci_fetch_array($stid)) {
+                                            echo "<tr><td>".$row["RTYPE"]."</td><td>".$row["BEDTYPE"]."</td><td>".$row["NUMBEDS"]."</td><td>".$row["RPRICE"]."</td></tr>";
+                                        }
+                                		echo '</table>';
+                                        echo "</div>";
+                                        echo "</div>";
                                     }
                                 }
                             }

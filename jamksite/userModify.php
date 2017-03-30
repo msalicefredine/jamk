@@ -126,7 +126,7 @@ if ($db_conn) {
      			$ccNum = $_POST['cc-num'];
      			$confNum = $_POST['conf-num'];
     			$result = DB::getInstance()->executePlainSQL("select * from modify_reservation
-    			         where ccNum=".$ccNum." and confNo=".$confNum);
+    			         where ccNum='".$ccNum."' and confNo='".$confNum."'");
     			$retrievedReservation = OCI_Fetch_Array($result, OCI_BOTH);
             }
             unset($_POST['userRetrieveSubmit']);

@@ -156,81 +156,55 @@
                             <input type="submit">
                         </form>-->
                         <form action="clientRoomSearch.php" method = "post">
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox1" value="junior">Junior Room</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox2" value="deluxe">Deluxe Room</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox3" value="queen">Queen Suite</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox4" value="premium">Premium Suite</label>
-                            </div>
-                            <hr>
-                            <div class="form-group" align="right">
-                                <button type="submit" id="clientRoomSearchSubmit" class="btn btn-primary btn-block">Search</button>
-                            </div>
+                        <?php
+                        include('db.php');
+
+                        $sql = 'select rtype from roomtype';
+                        $result = DB::getInstance()->executePlainSQL($sql);
+                        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                        	echo '<div class="checkbox">';
+                                echo '<label><input type="checkbox" name="'.$row["RTYPE"].'" value="'.$row["RTYPE"].'">'.$row["RTYPE"].' Room</label>';
+                            echo '</div>';
+                        }
+                           //  <div class="checkbox">
+//                                 <label><input type="checkbox" name="clientRoomCheckbox1" value="junior">Junior Room</label>
+//                             </div>
+//                             <div class="checkbox">
+//                                 <label><input type="checkbox" name="clientRoomCheckbox2" value="deluxe">Deluxe Room</label>
+//                             </div>
+//                             <div class="checkbox">
+//                                 <label><input type="checkbox" name="clientRoomCheckbox3" value="queen">Queen Suite</label>
+//                             </div>
+//                             <div class="checkbox">
+//                                 <label><input type="checkbox" name="clientRoomCheckbox4" value="premium">Premium Suite</label>
+//                             </div>
+//                             <hr>
+                            echo '<div class="form-group" align="right">';
+                                echo '<button type="submit" id="clientRoomSearchSubmit" class="btn btn-primary btn-block">Search</button>';
+                            echo '</div>';
+                            ?>
                         </form>
                     </div>
                     <div class="col-lg-6">
                         <h1 class="page-header">Results</h1>
                         <div id="resultsTable" class="table-responsive">
 <?php
-include('db.php');
 
 if ($db_conn) {
   	// echo "Successfully connected to Oracle"."<br>";
 	$roomtypes = "";
 	$count = 0;
+	$sql = 'select rtype from roomtype';
+    $result = DB::getInstance()->executePlainSQL($sql);
+	while($room = OCI_Fetch_Array($result, OCI_BOTH)) {
+		if(isset($_POST[$room["RTYPE"]])) {
+			$roomtypes = $roomtypes."'".$room["RTYPE"]."',";
+			$count++;
+		}
+	}
 
-
-	if(isset($_POST["clientRoomCheckbox1"]))
-		$count++;
-	if(isset($_POST["clientRoomCheckbox2"]))
-		$count++;
-	if(isset($_POST["clientRoomCheckbox3"]))
-		$count++;
-	if(isset($_POST["clientRoomCheckbox4"]))
-		$count++;
+	$roomtypes = rtrim($roomtypes,",");
 	$initialcount = $count;
-
-	if(isset($_POST["clientRoomCheckbox1"])){
-		$var1 = $_POST["clientRoomCheckbox1"];
-		//$roomtypes = $roomtypes.$var1;
-		$roomtypes = $roomtypes."'SINGLE'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
-
-	if(isset($_POST["clientRoomCheckbox2"])){
-		$var2 = $_POST["clientRoomCheckbox2"];
-		//$roomtypes = $roomtypes.$var2;
-		$roomtypes = $roomtypes."'DOUBLE'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
-
-	if(isset($_POST["clientRoomCheckbox3"])){
-		$var3 = $_POST["clientRoomCheckbox3"];
-		//$roomtypes = $roomtypes.$var3;
-		$roomtypes = $roomtypes."'QUEEN'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
-
-	if(isset($_POST["clientRoomCheckbox4"])){
-		$var4 = $_POST["clientRoomCheckbox4"];
-		//$roomtypes = $roomtypes.$var4;
-		$roomtypes = $roomtypes."'KING'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
 
 	// echo $roomtypes;
 	if($initialcount > 0){
