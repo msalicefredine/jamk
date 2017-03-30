@@ -181,7 +181,7 @@
 include('db.php');
 
 if ($db_conn) {
-  	echo "Successfully connected to Oracle"."<br>";
+  	// echo "Successfully connected to Oracle"."<br>";
 	$roomtypes = "";
 	$count = 0;
 
@@ -232,7 +232,7 @@ if ($db_conn) {
 			$roomtypes = $roomtypes.",";}
 	}
 
-	echo $roomtypes;
+	// echo $roomtypes;
 	if($initialcount > 0){
 	    // $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";
 	    $querystring = "SELECT * FROM Client c WHERE NOT EXISTS ((SELECT DISTINCT rtype FROM Roomtype where rtype in (".$roomtypes.")
