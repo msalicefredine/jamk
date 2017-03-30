@@ -184,10 +184,10 @@
                                 </li>
                             </ol>
                             <div class="checkbox">
-                                <label><input name="extra" type="radio" value="maximum"> Maximum </label>
+                                <label><input name="extra" type="radio" value="maximum"> Top manager - maximum </label>
                             </div>
                             <div class="checkbox">
-                                <label><input name="extra" type="radio" value="minimum"> Minimum</label>
+                                <label><input name="extra" type="radio" value="minimum"> Bottom manager - minimum </label>
                             </div>
                             <br>
                             <hr>

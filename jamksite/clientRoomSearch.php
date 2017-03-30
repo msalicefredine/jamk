@@ -147,7 +147,7 @@
 
                         <ol class="breadcrumb">
                             <li class="active">
-                                Find all clients who have stayed in all selected room types.
+                                Find all clients who have stayed in <strong>every</strong> selected room type.
                             </li>
                         </ol>
                         <!--<form action="clientRoomSearch.php" method="post">
