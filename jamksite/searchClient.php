@@ -166,10 +166,14 @@
                                 <option value="searchByChecked">Search By...</option>
                             </select><br><br>
                             <h4>Search by options</h4>
-                            <strong><input type="radio" name="nameChecked"> Client Name: </strong>
+                            <strong><input type="checkbox" name="nameChecked"> Client Name: </strong>
                             <input type="text" id="client-name" name ="filterName" placeholder="Eg. John"><br><br>
-                            <strong><input type="radio" name="numberChecked"> Phone Number: </strong>
-                            <input type="text" id="client-phone" name = "filterNo" placeholder="Eg, 555"><hr>
+                            <strong><input type="checkbox" name="numberChecked"> Phone Number: </strong>
+                            <input type="text" id="client-phone" name = "filterNo" placeholder="Eg, 555">
+                            <br><h4>Fields to display</h4>
+                            <input type="checkbox" name="toDisplayName" checked="checked"> Name <br>
+                            <input type="checkbox" name="toDisplayNum" checked="checked"> Phone Number
+                            <hr>
                             <div class="form-group" align="right">
                                 <button type="submit" class="btn btn-primary btn-block" id="clientSearchSubmit">Search</button>
                             </div>
@@ -186,10 +190,24 @@ include('db.php');
 
 if ($db_conn) {
   	// echo "Successfully connected to Oracle"."<br>";
+
+    if (isset($_POST["toDisplayName"]) && isset($_POST["toDisplayNum"])){
+        $display_fields = "Name, pNum";
+        $table_print = ["Client Name", "Phone Number"];
+    } else if(isset($_POST["toDisplayName"])){
+        $display_fields = "Name";
+        $table_print = ["Client Name"];
+    } else if (isset($_POST["toDisplayNum"])){
+        $display_fields = "pNum";
+        $table_print = ["Phone Number"];
+    } else {
+        $display_fields = "Name, pNum";
+        $table_print = ["Client Name", "Phone Number"];
+    }
 	if(($_POST["allOrSearch"])=="allChecked"){
 
-	$result = DB::getInstance()->executePlainSQL("select name,pnum from Client");
-	DB::getInstance()->printResult($result);
+	$result = DB::getInstance()->executePlainSQL("select ".$display_fields." from Client");
+	DB::getInstance()->printResultDynamic($result, $table_print);
 
 	}
 
@@ -199,19 +217,19 @@ if ($db_conn) {
 		if(isset($_POST["nameChecked"]) && isset($_POST["numberChecked"])){
 			$name = $_POST["filterName"];
 			$number = $_POST["filterNo"];
-			$result = DB::getInstance()->executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."') and pNum = '".$number."'");
-			DB::getInstance()->printResult($result);
+			$result = DB::getInstance()->executePlainSQL("select ".$display_fields." from Client where LOWER(name)= LOWER('".$name."') and pNum = '".$number."'");
+			DB::getInstance()->printResultDynamic($result, $table_print);
 		}
 		else if(isset($_POST["nameChecked"])){
 			$name = $_POST["filterName"];
-			$result = DB::getInstance()->executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."')");
-			DB::getInstance()->printResult($result);
+			$result = DB::getInstance()->executePlainSQL("select ".$display_fields." from Client where LOWER(name)= LOWER('".$name."')");
+			DB::getInstance()->printResultDynamic($result, $table_print);
 		}
 		else{
 
 			$number = $_POST["filterNo"];
-			$result = DB::getInstance()->executePlainSQL("select Name,pNum from Client where pNum='%".$number."%'");
-			DB::getInstance()->printResult($result);
+			$result = DB::getInstance()->executePlainSQL("select ".$display_fields." from Client where pNum LIKE '%".$number."%'");
+			DB::getInstance()->printResultDynamic($result, $table_print);
 		}
 	}
 

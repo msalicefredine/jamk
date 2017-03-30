@@ -1,7 +1,7 @@
 <?php
 
 $db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("ora_r8y8", "a21468137", $db);
+$db_conn = OCILogon("", "", $db);
 
 class DB {
 
@@ -67,6 +67,28 @@ class DB {
 	echo "</table>";
 
 	}
+
+    function printResultDynamic($result, $headers) { //prints results from a select statement
+        echo "<table class='table table-hover'>";
+        echo "<thead><tr>";
+        $headerItems = count($headers);
+        for($i = 0; $i < $headerItems; $i++) {
+            echo "<th>".$headers[$i]."</th>";
+        }
+        echo" </tr></thead>";
+        echo "<tbody>";
+        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+            $number = count($row);
+            echo "<tr>";
+            for($i = 0; $i < $number; $i++)
+                echo "<td>".$row[$i]."</td>";
+
+            echo "</tr>";
+        }
+        echo "</tbody>";
+        echo "</table>";
+
+    }
 
 	// Validates a manager authorization code
 	function checkManagerCode($code) {
