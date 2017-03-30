@@ -177,60 +177,6 @@
                     <div class="col-lg-6">
                         <h1 class="page-header">Results</h1>
                         <div id="resultsTable" class="table-responsive">
-		    	<!--<table class="table table-hover table-striped">
-                                <thead>
-                                <tr>
-                                    <th>Page</th>
-                                    <th>Visits</th>
-                                    <th>% New Visits</th>
-                                    <th>Revenue</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>/index.html</td>
-                                    <td>1265</td>
-                                    <td>32.3%</td>
-                                    <td>$321.33</td>
-                                </tr>
-                                <tr>
-                                    <td>/about.html</td>
-                                    <td>261</td>
-                                    <td>33.3%</td>
-                                    <td>$234.12</td>
-                                </tr>
-                                <tr>
-                                    <td>/sales.html</td>
-                                    <td>665</td>
-                                    <td>21.3%</td>
-                                    <td>$16.34</td>
-                                </tr>
-                                <tr>
-                                    <td>/blog.html</td>
-                                    <td>9516</td>
-                                    <td>89.3%</td>
-                                    <td>$1644.43</td>
-                                </tr>
-                                <tr>
-                                    <td>/404.html</td>
-                                    <td>23</td>
-                                    <td>34.3%</td>
-                                    <td>$23.52</td>
-                                </tr>
-                                <tr>
-                                    <td>/services.html</td>
-                                    <td>421</td>
-                                    <td>60.3%</td>
-                                    <td>$724.32</td>
-                                </tr>
-                                <tr>
-                                    <td>/blog/post.html</td>
-                                    <td>1233</td>
-                                    <td>93.2%</td>
-                                    <td>$126.34</td>
-                                </tr>
-                                </tbody>
-                            </table> -->
 <?php
 include('db.php');
 
@@ -288,9 +234,21 @@ if ($db_conn) {
 
 	echo $roomtypes;
 	if($initialcount > 0){
-	    $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";
+	    // $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";
+	    $querystring = "SELECT * FROM Client c WHERE NOT EXISTS ((SELECT DISTINCT rtype FROM Roomtype where rtype in (".$roomtypes.")
+	    MINUS (SELECT rmm.rtype FROM Reservation res inner join Room rmm on res.rnum=rmm.rnum where res.ccnum=c.ccnum and stayid is not null)))";
+	    // echo $querystring;
         $result = DB::getInstance()->executePlainSQL($querystring);
-	    DB::getInstance()->printResult($result);
+	echo "<table class='table table-hover'>";
+	echo "<thead><tr><th>Client Name</th><th>Phone No</th></tr></thead>";
+	echo "<tbody>";
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr>";
+		echo "<td>".$row["NAME"]."</td><td>".$row["PNUM"]."</td>";
+		echo "</tr>";
+	}
+	echo "</tbody>";
+	echo "</table>";
 	}
   	OCILogoff($db_conn);
 } else {
