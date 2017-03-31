@@ -243,8 +243,9 @@ if ($db_conn) {
 		$var1 = $_POST["floorValue"];
 		$minfloor = $var1 * 100 - 1;
 		$maxfloor = ($var1 + 1) * 100;
-		$result = DB::getInstance()->executePlainSQL("select * from room where rnum >". $minfloor." and rnum<".$maxfloor);
-		DB::getInstance()->printResultDynamic($result, ["Room", "Room Type"]);
+//        $result = DB::getInstance()->executePlainSQL("select * from room where rnum >". $minfloor." and rnum<".$maxfloor);
+        $result = DB::getInstance()->executePlainSQL("SELECT r.rNum, rt.rPrice FROM Room r, RoomType rt WHERE r.rType=rt.rType AND rnum >". $minfloor." and rnum<".$maxfloor);
+		DB::getInstance()->printResultDynamic($result, ["Room #", "Room Type Price ($)"]);
 		//echo $floorNoString;
 	}
 
@@ -256,9 +257,10 @@ if ($db_conn) {
             echo "<div id='authError' class='alert alert-danger'><strong>ERROR</strong> Please enter room number</div>";
         } else {
             $roomstring = "$var2";
-            $querystring = "select * from room where rnum = " . $roomstring;
+//            $querystring = "select * from room where rnum = " . $roomstring;
+            $querystring = "SELECT r.rNum, rt.rPrice FROM Room r, RoomType rt WHERE r.rType=rt.rType AND rnum = " . $roomstring;
             $result = DB::getInstance()->executePlainSQL($querystring);
-            DB::getInstance()->printResultDynamic($result, ["Room", "Room Type"]);
+            DB::getInstance()->printResultDynamic($result, ["Room #", "Room Type Price ($)"]);
         }
 	}
 
