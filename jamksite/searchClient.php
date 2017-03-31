@@ -130,6 +130,9 @@
                     <li>
                         <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp; Manage Rooms&nbsp;&nbsp;<i class="fa fa-lock"></i></a>
                     </li>
+                    <li style="vertical-align: bottom">
+                        <a href="userCreate.php"><i class="fa fa-user-secret"></i>&nbsp; Preview Client Interface</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
