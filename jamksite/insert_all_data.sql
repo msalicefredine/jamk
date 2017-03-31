@@ -49,6 +49,7 @@ insert into client values (1504044092136631,'7787701670','Ronnie');
 insert into client values (4215807674358893,'6043173329','Sophia');
 insert into client values (8773701527287601,'2060952317','Tanya');
 insert into client values (1117768195235324,'6045816714','Julia');
+insert into client values (1111111111111111,'6041111111','Bob');
 
 insert into roomtype values ('SINGLE','SINGLE',1,100);
 insert into roomtype values ('SINGLE-2','SINGLE',2,110);
@@ -57,6 +58,7 @@ insert into roomtype values ('QUEEN','QUEEN',2,180);
 insert into roomtype values ('KING','KING',1,190);
 insert into roomtype values ('DELUXE','KING',1,400);
 insert into roomtype values ('DUMMY','NONE',0,0);
+insert into roomtype values ('DUMMY-2','NONE',0,0);
 
 insert into stay values (1,'Credit','Y',240,'20110101','20110102','09:00PM','12:00PM',8,9);
 insert into stay values (2,'Cash','Y',600,'20130101','20130102','09:00PM','12:00PM',1,1);
@@ -73,6 +75,8 @@ insert into stay values (12,'Credit','Y',500,'20170101','20170115','09:00PM','11
 insert into stay values (13,'Credit','N',450,'20170328','20170410','09:00PM',NULL,1,NULL);
 insert into stay values (14,'Credit','Y',450,'20170202','20170203','09:00PM','10:00AM',1,3);
 insert into stay values (15,'Credit','N',450,'20170329','20170415','07:45PM',NULL,1,NULL);
+insert into stay values (16,'Credit','Y',450,'20170329','20170415','09:00PM','10:00AM',1,3);
+insert into stay values (17,'Credit','Y',450,'20170329','20170415','09:00PM','10:00AM',1,3);
 
 insert into room values (100,'SINGLE');
 insert into room values (102,'SINGLE');
@@ -116,6 +120,8 @@ insert into reservation values (12,203,1349693474168826,'20170101','20170115',12
 insert into reservation values (13,103,8773701527287601,'20170328','20170410',13);
 insert into reservation values (14,108,1530780613611425,'20170202','20170203',14);
 insert into reservation values (15,113,7942843977867974,'20170329','20170415',15);
+insert into reservation values (16,300,7942843977867974,'20170329','20170415',16);
+insert into reservation values (17,301,7942843977867974,'20170329','20170415',17);
 
 insert into discounts values (1,1,10);
 insert into discounts values (1,2,15);
