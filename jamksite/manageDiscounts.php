@@ -329,7 +329,7 @@ if ($db_conn) {
 	}
 	else{
 		echo "<div id='authError' class='alert alert-danger'>";
-        echo "Please enter the manager authorization code";
+        echo "<strong>ERROR</strong> Invalid manager authorization code";
         echo "</div>";
 
 	}
