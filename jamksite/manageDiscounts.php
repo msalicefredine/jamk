@@ -309,7 +309,8 @@ function checkCode(){
 }
 
 if ($db_conn) {
-  	if($_POST["auth"] ){
+	
+  	if($_SERVER['REQUEST_METHOD'] == "POST"){
   		if(checkCode()){
   				$var1 = $_POST["discount"];
   				if($var1 == "highestavg")
@@ -327,12 +328,7 @@ if ($db_conn) {
 
 		}
 	}
-	else{
-		echo "<div id='authError' class='alert alert-danger'>";
-        echo "<strong>ERROR</strong> Invalid manager authorization code";
-        echo "</div>";
 
-	}
 
   	OCILogoff($db_conn);
 } else {
