@@ -114,76 +114,74 @@
                             <?php
                             require('db.php');
                             if (!$db_conn) {
-                                 	echo '<div class="alert alert-danger alert-dismissable">';
-									echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-									echo '<strong>Oracle Connect Error! </strong>';
-									$e = OCI_Error(); // For OCIParse errors pass the
-									// connection handle
-									echo htmlentities($e['message']);
-									echo "</div>";
+                                echo '<div class="alert alert-danger alert-dismissable">';
+                                echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+                                echo '<strong>Oracle Connect Error! </strong>';
+								$e = OCI_Error(); // For OCIParse errors pass the
+								// connection handle
+								echo htmlentities($e['message']);
+								echo "</div>";
                             }
                             if ($_SERVER['REQUEST_METHOD'] == "POST") {
-                                 // ensure that the dates are valid
                                 $FromDate = $_POST['start-date'];
                                 $ToDate = $_POST['end-date'];
-                                if ($FromDate > $ToDate) {
-                                    echo "<div class='alert alert-danger alert-dismissable'>";
-                                    echo "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>";
-                                    echo "<strong>Please select a valid date range.</strong>";
+                                // check if primary key ccnum is already in the database. if so update its associated entries.
+                                $CreditCardNumber = $_POST['cc-num'];
+                                $PhoneNumber = $_POST['client-phone'];
+                                $ClientName = $_POST['client-name'];
+                                $sql = "merge into client c using
+                                (select ".$CreditCardNumber." ccnum, '".$ClientName."' name, ".$PhoneNumber." pnum from dual) s
+                                on (c.ccnum = s.ccnum) when matched then update set c.name=s.name, c.pnum=s.pnum
+                                when not matched then insert (ccnum, pnum, name) values (s.ccnum, s.pnum, s.name)"; 
+                                $stid = oci_parse($db_conn, $sql);
+                                $result = oci_execute($stid);
+                                OCICOMMIT($db_conn);
+                                 // if constraint violated display error message
+                                if (!$result) {
+                                    echo '<div class="alert alert-danger alert-dismissable">';
+                                    echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+                                    echo '<strong>Database Error! </strong>';
+                                    echo "Cannot execute the following command: " . $sql . "<br>";
+                                    $e = oci_error($stid); // For OCIExecute errors pass the statementhandle
+                                    echo htmlentities($e['message']);
                                     echo "</div>";
                                 } else {
-                                    // TODO: add client to client table only if client doesn't already exist
-                                    // also need to check if their current details match new details...
-                                    $CreditCardNumber = $_POST['cc-num'];
-                                    $PhoneNumber = $_POST['client-phone'];
-                                    $ClientName = $_POST['client-name'];
-									$sql = "merge into client c using
-											(select ".$CreditCardNumber." ccnum, '".$ClientName."' name, ".$PhoneNumber." pnum from dual) s
-											on (c.ccnum = s.ccnum) when matched then update set c.name=s.name, c.pnum=s.pnum
-											when not matched then insert (ccnum, pnum, name) values (s.ccnum, s.pnum, s.name)";
-									// echo $sql;
+                                    // check if there are any available rooms of the indicated room type
+                                    $RoomType = $_POST['room-type'];
+                                    $sql = "SELECT MAX(rNum) AS MAXRNUM FROM Room WHERE rType='".$RoomType."' AND rNum NOT IN (SELECT rNum FROM Reservation WHERE (fromDate <= '".$ToDate."' AND toDate >= '".$FromDate."'))";
                                     $stid = oci_parse($db_conn, $sql);
-                                    $result = oci_execute($stid);
-                                    OCICOMMIT($db_conn);
-                                    // if constraint violated display error message
-                                    if (!$result) {
-                                        echo '<div class="alert alert-danger alert-dismissable">';
-                                        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
-                                        echo '<strong>Database Error! </strong>';
-                                        echo "Cannot execute the following command: " . $sql . "<br>";
-                                        $e = oci_error($stid); // For OCIExecute errors pass the statementhandle
-                                        echo htmlentities($e['message']);
-                                        echo "</div>";
-                                    } else {
-                                        // check if there are any available rooms of the indicated room type
-                                        $RoomType = $_POST['room-type'];
-                                        $sql = "SELECT MAX(rNum) AS MAXRNUM FROM Room WHERE rType='".$RoomType."' AND rNum NOT IN (SELECT rNum FROM Reservation WHERE (fromDate <= '".$ToDate."' AND toDate >= '".$FromDate."'))";
-                                        // echo $sql;
+                                    oci_execute($stid);
+                                    $RoomNumber = oci_fetch_array($stid);
+                                    $RoomNumber = $RoomNumber['MAXRNUM'];
+                                    // if such a room is available insert reservation into reservation table
+                                    if ($RoomNumber) {
+                                        $sql = "INSERT INTO Reservation (RNUM, CCNUM, FROMDATE, TODATE, STAYID) VALUES (".$RoomNumber.", ".$CreditCardNumber.", '".$FromDate."', '".$ToDate."', NULL)";
                                         $stid = oci_parse($db_conn, $sql);
-                                        oci_execute($stid);
-                                        $RoomNumber = oci_fetch_array($stid);
-                                        // echo $RoomNumber;
-                                        $RoomNumber = $RoomNumber['MAXRNUM'];
-                                        // echo $RoomNumber;
-                                        // if such a room is available insert reservation into reservation table
-                                        if ($RoomNumber) {
-                                            $sql = "INSERT INTO Reservation (RNUM, CCNUM, FROMDATE, TODATE, STAYID) VALUES (".$RoomNumber.", ".$CreditCardNumber.", '".$FromDate."', '".$ToDate."', NULL)";
-                                            $stid = oci_parse($db_conn, $sql);
-                                            oci_execute($stid);
-                                            // retrieve confirmation number to display later
+                                        $result = oci_execute($stid);
+                                        // print error if constraint violated
+                                        if (!$result) {
+                                            echo '<div class="alert alert-danger alert-dismissable">';
+                                            echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+                                            echo '<strong>Database Error! </strong>';
+                                            echo "Cannot execute the following command: " . $sql . "<br>";
+                                            $e = oci_error($stid); // For OCIExecute errors pass the statementhandle
+                                            echo htmlentities($e['message']);
+                                            echo "</div>";
+                                        } else {
+                                        // retrieve confirmation number to display later
                                             $sql = "SELECT confNo FROM Reservation WHERE rNum=".$RoomNumber." AND fromDate='".$FromDate."' AND toDate='".$ToDate."'";
                                             $stid = oci_parse($db_conn, $sql);
                                             oci_execute($stid);
                                             $ConfirmationNumber = oci_fetch_array($stid);
                                             $ConfirmationNumber = $ConfirmationNumber['CONFNO'];
                                             // echo $ConfirmationNumber;
-                                        } else {
-                                            // else throw error
-                                            echo "<div class='alert alert-danger alert-dismissable'>";
-                                            echo "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>";
-                                            echo "<strong>The selected room type is not available for your selected dates.</strong>";
-                                            echo "</div>";
                                         }
+                                    } else {
+                                        // if no rooms available display error
+                                        echo "<div class='alert alert-danger alert-dismissable'>";
+                                        echo "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>";
+                                        echo "<strong>The selected room type is not available for your selected dates.</strong>";
+                                        echo "</div>";
                                     }
                                 }
                             }
