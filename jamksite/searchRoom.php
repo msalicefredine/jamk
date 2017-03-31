@@ -237,7 +237,7 @@
 include('db.php');
 
 if ($db_conn) {
-  	echo "Successfully connected to Oracle"."<br>";
+  	//echo "Successfully connected to Oracle"."<br>";
 
 	if($_POST["roomSearchRadio"]=="floor"){
 		$var1 = $_POST["floorValue"];

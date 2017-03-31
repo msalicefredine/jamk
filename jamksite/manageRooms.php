@@ -147,6 +147,7 @@
 
                             <?php
                             require ('db.php');
+                            $result = null;
 
                             if (!$db_conn) {
                                  	echo '<div class="alert alert-danger alert-dismissable">';
@@ -175,7 +176,7 @@
 
                                 	// if foreign key constraint violated display error message
                                     if (!$result) {
-                                        echo '<div class="alert alert-danger alert-dismissable">';
+                                        /*echo '<div class="alert alert-danger alert-dismissable">';
                                         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
                                         echo '<strong>Database Error! </strong>';
                                         echo "Cannot execute the following command: " . $sql . "<br>";
@@ -183,7 +184,7 @@
                                         echo htmlentities($e['message']);
                                         echo "</div>";
 
-                                        echo '<div class="col-lg-6">';
+                                       // echo '<div class="col-lg-6">';
                             			echo '<h3>Associated Rooms</h3>';
                             			echo '<div id="resultsTable" class="table-responsive">';
                                 		echo '<table class="table table-hover table-striped">';
@@ -202,8 +203,8 @@
                                         while($row = oci_fetch_array($stid)) {
                                             echo "<tr><td>".$row["RNUM"]."</td><td>".$row["RTYPE"]."</td></tr>";
                                         }
-                                		echo '</table>';
-                            			echo '</div>';
+                                		echo '</table>';*/
+                            			// echo '</div>';
                                     } else {
                                         echo '<div class="alert alert-success alert-dismissable">';
                                         echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
@@ -273,35 +274,45 @@
                                 </div>
                             </form>
                         </div>
-                        <!-- <div class="col-lg-6">
-                            <h1 class="page-header">Rooms</h1>
+                         <div class="col-lg-6">
+                            <h1 class="page-header">Associated Rooms</h1>
                             <div id="resultsTable" class="table-responsive">
                                 <table class="table table-hover table-striped">
                                     <?php
-                                    if ($CorrectCode) {
+                                    if ($CorrectCode && !$result) {
+                                    	echo '<div class="alert alert-danger alert-dismissable">';
+                                        echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+                                        echo '<strong>Database Error! </strong>';
+                                        echo "Cannot execute the following command: " . $sql . "<br>";
+                                        $e = oci_error($stid); // For OCIExecute errors pass the statementhandle
+                                        echo htmlentities($e['message']);
+                                        echo "</div>";
+
+                                        // echo '<h3>Associated Rooms</h3>';
+                            			echo '<div id="resultsTable" class="table-responsive">';
+                                		echo '<table class="table table-hover table-striped">';
                                         echo "<thead>";
                                         echo "<tr>";
+                                        echo "<th>Room Number</th>";
                                         echo "<th>Room Type</th>";
-                                        echo "<th>Bed Type</th>";
-                                        echo "<th>Number of Beds</th>";
-                                        echo "<th>Price</th>";
                                         echo "</tr>";
                                         echo "</thead>";
                                         echo "<tbody>";;
-                                        $sql = "SELECT * FROM RoomType";
+                                        $sql = "SELECT * FROM Room where rtype='".$RoomType."'";
                                         $stid = oci_parse($db_conn, $sql);
                                         oci_execute($stid);
                                         while($row = oci_fetch_array($stid)) {
-                                            echo "<tr><td>".$row["RTYPE"]."</td><td>".$row["BEDTYPE"]."</td><td>".$row["NUMBEDS"]."</td><td>".$row["RPRICE"]."</td></tr>";
+                                            echo "<tr><td>".$row["RNUM"]."</td><td>".$row["RTYPE"]."</td></tr>";
                                         }
+                                		echo '</table>';
                                     } else {
-                                        echo "<div id='authError' class='alert alert-danger'>";
+                                        /*echo "<div id='authError' class='alert alert-danger'>";
                                         echo "Please enter the manager authorization code";
-                                        echo "</div>";
+                                        echo "</div>";*/
                                     }
                                     ?>
                                 </table>
-                            </div> -->
+                            </div>
                         </div>
 
                         <!-- /.row -->
