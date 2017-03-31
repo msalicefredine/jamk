@@ -130,6 +130,9 @@
                     <li>
                         <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp; Manage Rooms&nbsp;&nbsp;<i class="fa fa-lock"></i></a>
                     </li>
+                    <li style="vertical-align: bottom">
+                        <a href="userCreate.php"><i class="fa fa-user-secret"></i>&nbsp; Preview Client Interface</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -166,10 +169,14 @@
                                 <option value="searchByChecked">Search By...</option>
                             </select><br><br>
                             <h4>Search by options</h4>
-                            <strong><input type="radio" name="nameChecked"> Client Name: </strong>
+                            <strong><input type="checkbox" name="nameChecked"> Client Name: </strong>
                             <input type="text" id="client-name" name ="filterName" placeholder="Eg. John"><br><br>
-                            <strong><input type="radio" name="numberChecked"> Phone Number: </strong>
-                            <input type="text" id="client-phone" name = "filterNo" placeholder="Eg, 555"><hr>
+                            <strong><input type="checkbox" name="numberChecked"> Phone Number: </strong>
+                            <input type="text" id="client-phone" name = "filterNo" placeholder="Eg, 555">
+                            <br><h4>Fields to display</h4>
+                            <input type="checkbox" name="toDisplayName" checked="checked"> Name <br>
+                            <input type="checkbox" name="toDisplayNum" checked="checked"> Phone Number
+                            <hr>
                             <div class="form-group" align="right">
                                 <button type="submit" class="btn btn-primary btn-block" id="clientSearchSubmit">Search</button>
                             </div>
@@ -180,112 +187,66 @@
                     <h1 class="page-header">Results</h1>
                         <div id="resultsTable" class="table-responsive">
 
-                    
-<?php 
-$db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("", "", $db);
 
+<?php
+include('db.php');
 
+if ($db_conn) {
+  	// echo "Successfully connected to Oracle"."<br>";
 
-
-
-function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
-	//echo "<br>running ".$cmdstr."<br>";
-	global $db_conn, $success;
-	$statement = OCIParse($db_conn, $cmdstr); //There is a set of comments at the end of the file that describe some of the OCI specific functions and how they work
-
-	if (!$statement) {
-		echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-		$e = OCI_Error($db_conn); // For OCIParse errors pass the       
-		// connection handle
-		echo htmlentities($e['message']);
-		$success = False;
-	}
-
-	$r = OCIExecute($statement, OCI_DEFAULT);
-	if (!$r) {
-		echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-		$e = oci_error($statement); // For OCIExecute errors pass the statementhandle
-		echo htmlentities($e['message']);
-		$success = False;
-	} else {
-
-	}
-	return $statement;
-
-}
-
-function printResult($result) { //prints results from a select statement
-	echo "<table class='table table-hover'>";
-	echo "<thead><tr><th>Client Name</th><th>Phone No</th></tr></thead>";
-	echo "<tbody>";
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		$number = count($row);
-		echo "<tr>";
-		for($i = 0; $i < $number; $i++)
-			echo "<td>".$row[$i]."</td>";
-	
-		echo "</tr>";
-	}
-	echo "</tbody>";
-	echo "</table>";
-
-}
-
-if (db_conn) {
-  	echo "Successfully connected to Oracle"."<br>";
+    if (isset($_POST["toDisplayName"]) && isset($_POST["toDisplayNum"])){
+        $display_fields = "Name, pNum";
+        $table_print = ["Client Name", "Phone Number"];
+    } else if(isset($_POST["toDisplayName"])){
+        $display_fields = "Name";
+        $table_print = ["Client Name"];
+    } else if (isset($_POST["toDisplayNum"])){
+        $display_fields = "pNum";
+        $table_print = ["Phone Number"];
+    } else {
+        $display_fields = "Name, pNum";
+        $table_print = ["Client Name", "Phone Number"];
+    }
 	if(($_POST["allOrSearch"])=="allChecked"){
-	
-	$result = executePlainSQL("select Name,pNum from Client");
-	printResult($result);
+
+	$result = DB::getInstance()->executePlainSQL("select ".$display_fields." from Client");
+	DB::getInstance()->printResultDynamic($result, $table_print);
 
 	}
 
 	else{
-	
+
 	if(isset($_POST["nameChecked"]) || isset($_POST["numberChecked"])){
 		if(isset($_POST["nameChecked"]) && isset($_POST["numberChecked"])){
 			$name = $_POST["filterName"];
 			$number = $_POST["filterNo"];
-			$result = executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."') and pNum = '".$number."'");
-			printResult($result);
+			$result = DB::getInstance()->executePlainSQL("select ".$display_fields." from Client where LOWER(name)= LOWER('".$name."') and pNum = '".$number."'");
+			DB::getInstance()->printResultDynamic($result, $table_print);
 		}
 		else if(isset($_POST["nameChecked"])){
 			$name = $_POST["filterName"];
-			$result = executePlainSQL("select Name,pNum from Client where LOWER(name)= LOWER('".$name."')");
-			printResult($result);
+			$result = DB::getInstance()->executePlainSQL("select ".$display_fields." from Client where LOWER(name)= LOWER('".$name."')");
+			DB::getInstance()->printResultDynamic($result, $table_print);
 		}
 		else{
 
 			$number = $_POST["filterNo"];
-			$result = executePlainSQL("select Name,pNum from Client where pNum='%".$number."%'");
-			printResult($result);
+			$result = DB::getInstance()->executePlainSQL("select ".$display_fields." from Client where pNum LIKE '%".$number."%'");
+			DB::getInstance()->printResultDynamic($result, $table_print);
 		}
 	}
 
 	}
-	/*if(isset( $_POST["clientSearchRadioAll"])){ 
-
-	$result = executePlainSQL("select Name,pNum from Client");
-	printResult($result);}
-	else{
-		
-	if(isset( $_POST["clientSearchRadioName"])){ 
-
-	$result = executePlainSQL("select Name from Client");
-	printResult($result);}
-
-	if(isset( $_POST["clientSearchRadioNumber"])){ 
-
-	$result = executePlainSQL("select pNum from Client");
-	printResult($result);}
-	}*/	
-
 
   	OCILogoff($db_conn);
 } else {
-  	$err = OCIError();
-  	echo "Oracle Connect Error " . $err['message'];
+  	echo '<div class="alert alert-danger alert-dismissable">';
+	echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+	echo '<strong>Oracle Connect Error! </strong>';
+		$e = OCI_Error(); // For OCIParse errors pass the
+		// connection handle
+		echo htmlentities($e['message']);
+	echo "</div>";
 }
 ?>
 

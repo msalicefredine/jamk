@@ -128,6 +128,9 @@
                     <li>
                         <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp; Manage Rooms&nbsp;&nbsp; <i class="fa fa-lock"></i></a>
                     </li>
+                    <li>
+                        <a href="userCreate.php"><i class="fa fa-user-secret"></i>&nbsp; Preview Client Interface</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -146,28 +149,45 @@
                             Manage Discounts
                         </h1>
 
-                        <div class="alert alert-danger">
+                        <div class="alert alert-warning">
                                 <strong>Managers only</strong> - code is required
                         </div>
 
                         <form action="manageDiscounts.php" method="post">
                             <div class="input-group">
                                 <span class="input-group-addon">Authorization Code</span>
-                                <input id="managerAuth" type="text" class="form-control" name="auth">
+                                <input id="managerAuth" type="number" class="form-control" name="auth">
                             </div>
                             <hr>
                             <h3>Get Discount Reports</h3>
                             <ol class="breadcrumb">
                                 <li class="active">
-                                    Run reports grouped by minimum or maximum average discount rates.
+                                    Run reports grouped by managers
                                 </li>
                             </ol>
+
                             <div class="checkbox">
-                                <label><input name="discountsRadio" checked="checked" type="radio" value="min"> Minimum average discount</label>
+                                <label><input name="discount" checked="checked" type="radio" value="avg"> Average per Manager</label>
                             </div>
                             <div class="checkbox">
-                                <label><input name="discountsRadio" type="radio" value="max"> Maximum average discount</label>
+                                <label><input name="discount" type="radio" value="max"> Max Discount per Manager</label>
                             </div>
+                            <div class="checkbox">
+                                <label><input name="discount" type="radio" value="min"> Min Discount per Manager</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input name="discount" type="radio" value="sum"> Sum of Discounts per Manager</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input name="discount" type="radio" value="count"> Number of Discounts per Manager</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input name="discount" type="radio" value="highestavg"> Highest Average Discount</label>
+                            </div>
+                            <div class="checkbox">
+                                <label><input name="discount" type="radio" value="lowestavg"> Lowest Average Discount</label>
+                            </div>
+                           
                             <br>
                             <hr>
                             <div class="form-group" align="right">
@@ -177,9 +197,9 @@
                     </div>
                     <div class="col-lg-6">
                         <h1 class="page-header">Results</h1>
-                        <div id="authError" class="alert alert-danger" style="display:none;">
+                        <!--<div id="authError" class="alert alert-danger" style="display:none;">
                             <strong>ERROR</strong> Invalid manager authorization code
-                        </div>
+                        </div>-->
                         <div id="resultsTable" class="table-responsive">
                             <!--<table class="table table-hover table-striped">
                                 <thead>
@@ -235,69 +255,93 @@
                                 </tr>
                                 </tbody>
                             </table>-->
-                        
-<?php 
-$db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("", "", $db);
 
-
-
-
-
-function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
-	//echo "<br>running ".$cmdstr."<br>";
-	global $db_conn, $success;
-	$statement = OCIParse($db_conn, $cmdstr); //There is a set of comments at the end of the file that describe some of the OCI specific functions and how they work
-
-	if (!$statement) {
-		echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-		$e = OCI_Error($db_conn); // For OCIParse errors pass the       
-		// connection handle
-		echo htmlentities($e['message']);
-		$success = False;
-	}
-
-	$r = OCIExecute($statement, OCI_DEFAULT);
-	if (!$r) {
-		echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-		$e = oci_error($statement); // For OCIExecute errors pass the statementhandle
-		echo htmlentities($e['message']);
-		$success = False;
-	} else {
-
-	}
-	return $statement;
-
-}
-
+<?php
+include('db.php');
 
 function printResult($result) { //prints results from a select statement
 	echo "<table class='table table-hover table-striped'>";
-	echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Average Discount</th></tr></thead>";
+	$var1 = $_POST["discount"];
+	if($var1 == "avg")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Average Discount</th></tr></thead>";
+	elseif ($var1 == "max")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Maximum Discount</th></tr></thead>";
+	elseif ($var1 == "min")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Minimum Discount</th></tr></thead>";
+	elseif ($var1 == "sum")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Sum of Discounts</th></tr></thead>";
+	elseif ($var1 == "count")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Number of Discounts</th></tr></thead>";
+	elseif ($var1 == "highestavg")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Highest Average Discount</th></tr></thead>";
+	else
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Lowest Average Discount</th></tr></thead>";
 	echo "<tbody>";
+
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		$number = count($row);
-		echo "<tr>";
-		for($i = 0; $i < $number; $i++)
-			echo "<td>".$row[$i]."</td>";
-	
-		echo "</tr>";
+		printRow($row);
 	}
+
 	echo "</tbody>";
 	echo "</table>";
 
 }
 
-if (db_conn) {
-  	echo "Successfully connected to Oracle"."<br>";
-        $result = executePlainSQL("select e.name, d.eid, AVG(d.amount) from employee e, discounts d where e.eid = d.eid group by e.name, d.eid");
+function printRow($row){
+	$number = count($row);
 
-	printResult($result);
+	echo "<tr>";
+	for($i = 0; $i < $number; $i++)
+		echo "<td>".$row[$i]."</td>";
+
+	echo "</tr>";
+}
+
+function checkCode(){
+
+	$correctCode = false;
+
+	$result = DB::getInstance()->executePlainSQL("select overridecode from manager");
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		if($row[0] == $_POST["auth"]){
+			$correctCode = true;
+			break;
+		}
+	}
+	return $correctCode;
+}
+
+if ($db_conn) {
 	
+  	if($_SERVER['REQUEST_METHOD'] == "POST"){
+  		if(checkCode()){
+  				$var1 = $_POST["discount"];
+  				if($var1 == "highestavg")
+  					$result = DB::getInstance()->executePlainSQL("select e.name, d.eid, avg(amount) as HighestAverageDiscount from employee e, discounts d where e.eid = d.eid group by e.name, d.eid having avg(amount) = (select max(avg(amount)) from discounts f group by f.eid)");
+  				elseif($var1 == "lowestavg")
+  					$result = DB::getInstance()->executePlainSQL("select e.name, d.eid, avg(amount) as LowestAverageDiscount from employee e, discounts d where e.eid = d.eid group by e.name, d.eid having avg(amount) = (select min(avg(amount)) from discounts f group by f.eid)");
+  				else
+					$result = DB::getInstance()->executePlainSQL("select e.name, d.eid, ".$var1."(d.amount) from employee e, discounts d where e.eid = d.eid group by e.name, d.eid");
+				printResult($result);
+		}
+		else{
+			 echo "<div id='authError' class='alert alert-danger'>";
+        	 echo  "<strong>ERROR</strong> Invalid manager authorization code";
+       		 echo "</div>";
+
+		}
+	}
+
+
   	OCILogoff($db_conn);
 } else {
-  	$err = OCIError();
-  	echo "Oracle Connect Error " . $err['message'];
+ 	echo '<div class="alert alert-danger alert-dismissable">';
+	echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+	echo '<strong>Oracle Connect Error! </strong>';
+		$e = OCI_Error(); // For OCIParse errors pass the
+		// connection handle
+		echo htmlentities($e['message']);
+	echo "</div>";
 }
 ?>
 

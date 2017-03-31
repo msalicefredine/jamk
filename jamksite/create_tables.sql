@@ -1,3 +1,4 @@
+DROP VIEW modify_reservation;
 DROP TABLE Discounts;
 DROP TABLE Reservation;
 DROP TABLE Room;
@@ -103,7 +104,8 @@ CREATE TABLE Reservation
 	FOREIGN KEY (ccNum) REFERENCES Client
 		ON DELETE CASCADE,
 	FOREIGN KEY (stayId) REFERENCES Stay
-		ON DELETE CASCADE);
+		ON DELETE CASCADE,
+	constraint date_check CHECK (fromDate < toDate));
 
 CREATE SEQUENCE reservation_sequence
 START WITH 500
@@ -131,4 +133,9 @@ ON DELETE CASCADE,
 	FOREIGN KEY (stayId)
 REFERENCES Stay
 ON DELETE CASCADE);
+
+CREATE VIEW modify_reservation AS
+SELECT c.name,c.ccnum,r.confno,r.fromdate,r.todate,c.pnum,rm.rtype
+from Reservation r inner join Client c on c.ccNum=r.ccNum
+	inner join Room rm on r.rnum=rm.rnum;
 

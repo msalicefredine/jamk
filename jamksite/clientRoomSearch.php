@@ -128,6 +128,9 @@
                     <li>
                         <a href="manageRooms.php"><i class="fa fa-wrench"></i>&nbsp;Manage Rooms&nbsp;&nbsp; <i class="fa fa-lock"></i></a>
                     </li>
+                    <li>
+                        <a href="userCreate.php"><i class="fa fa-user-secret"></i>&nbsp; Preview Client Interface</a>
+                    </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -147,7 +150,7 @@
 
                         <ol class="breadcrumb">
                             <li class="active">
-                                Find all clients who have stayed in all selected room types.
+                                Find all clients who have stayed in <strong>every</strong> selected room type.
                             </li>
                         </ol>
                         <!--<form action="clientRoomSearch.php" method="post">
@@ -156,194 +159,83 @@
                             <input type="submit">
                         </form>-->
                         <form action="clientRoomSearch.php" method = "post">
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox1" value="junior">Junior Room</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox2" value="deluxe">Deluxe Room</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox3" value="queen">Queen Suite</label>
-                            </div>
-                            <div class="checkbox">
-                                <label><input type="checkbox" name="clientRoomCheckbox4" value="premium">Premium Suite</label>
-                            </div>
-                            <hr>
-                            <div class="form-group" align="right">
-                                <button type="submit" id="clientRoomSearchSubmit" class="btn btn-primary btn-block">Search</button>
-                            </div>
+                        <?php
+                        include('db.php');
+
+                        $sql = 'select rtype from roomtype';
+                        $result = DB::getInstance()->executePlainSQL($sql);
+                        while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+                        	echo '<div class="checkbox">';
+                                echo '<label><input type="checkbox" name="'.$row["RTYPE"].'" value="'.$row["RTYPE"].'">'.$row["RTYPE"].' Room</label>';
+                            echo '</div>';
+                        }
+                           //  <div class="checkbox">
+//                                 <label><input type="checkbox" name="clientRoomCheckbox1" value="junior">Junior Room</label>
+//                             </div>
+//                             <div class="checkbox">
+//                                 <label><input type="checkbox" name="clientRoomCheckbox2" value="deluxe">Deluxe Room</label>
+//                             </div>
+//                             <div class="checkbox">
+//                                 <label><input type="checkbox" name="clientRoomCheckbox3" value="queen">Queen Suite</label>
+//                             </div>
+//                             <div class="checkbox">
+//                                 <label><input type="checkbox" name="clientRoomCheckbox4" value="premium">Premium Suite</label>
+//                             </div>
+//                             <hr>
+                            echo '<div class="form-group" align="right">';
+                                echo '<button type="submit" id="clientRoomSearchSubmit" class="btn btn-primary btn-block">Search</button>';
+                            echo '</div>';
+                            ?>
                         </form>
                     </div>
                     <div class="col-lg-6">
                         <h1 class="page-header">Results</h1>
                         <div id="resultsTable" class="table-responsive">
-		    	<!--<table class="table table-hover table-striped">
-                                <thead>
-                                <tr>
-                                    <th>Page</th>
-                                    <th>Visits</th>
-                                    <th>% New Visits</th>
-                                    <th>Revenue</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>/index.html</td>
-                                    <td>1265</td>
-                                    <td>32.3%</td>
-                                    <td>$321.33</td>
-                                </tr>
-                                <tr>
-                                    <td>/about.html</td>
-                                    <td>261</td>
-                                    <td>33.3%</td>
-                                    <td>$234.12</td>
-                                </tr>
-                                <tr>
-                                    <td>/sales.html</td>
-                                    <td>665</td>
-                                    <td>21.3%</td>
-                                    <td>$16.34</td>
-                                </tr>
-                                <tr>
-                                    <td>/blog.html</td>
-                                    <td>9516</td>
-                                    <td>89.3%</td>
-                                    <td>$1644.43</td>
-                                </tr>
-                                <tr>
-                                    <td>/404.html</td>
-                                    <td>23</td>
-                                    <td>34.3%</td>
-                                    <td>$23.52</td>
-                                </tr>
-                                <tr>
-                                    <td>/services.html</td>
-                                    <td>421</td>
-                                    <td>60.3%</td>
-                                    <td>$724.32</td>
-                                </tr>
-                                <tr>
-                                    <td>/blog/post.html</td>
-                                    <td>1233</td>
-                                    <td>93.2%</td>
-                                    <td>$126.34</td>
-                                </tr>
-                                </tbody>
-                            </table> -->
-<?php 
-$db = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))";
-$db_conn = OCILogon("", "", $db);
+<?php
 
-
-
-
-
-function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
-	//echo "<br>running ".$cmdstr."<br>";
-	global $db_conn, $success;
-	$statement = OCIParse($db_conn, $cmdstr); //There is a set of comments at the end of the file that describe some of the OCI specific functions and how they work
-
-	if (!$statement) {
-		echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
-		$e = OCI_Error($db_conn); // For OCIParse errors pass the       
-		// connection handle
-		echo htmlentities($e['message']);
-		$success = False;
+if ($db_conn) {
+  	// echo "Successfully connected to Oracle"."<br>";
+	$roomtypes = "";
+	$count = 0;
+	$sql = 'select rtype from roomtype';
+    $result = DB::getInstance()->executePlainSQL($sql);
+	while($room = OCI_Fetch_Array($result, OCI_BOTH)) {
+		if(isset($_POST[$room["RTYPE"]])) {
+			$roomtypes = $roomtypes."'".$room["RTYPE"]."',";
+			$count++;
+		}
 	}
 
-	$r = OCIExecute($statement, OCI_DEFAULT);
-	if (!$r) {
-		echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
-		$e = oci_error($statement); // For OCIExecute errors pass the statementhandle
-		echo htmlentities($e['message']);
-		$success = False;
-	} else {
+	$roomtypes = rtrim($roomtypes,",");
+	$initialcount = $count;
 
-	}
-	return $statement;
-
-}
-
-function printResult($result) { //prints results from a select statement
-	echo "<table class='table table-hover table-striped'>";
-	echo "<thead><tr><th>Credit Card</th><th>Phone No.</th><th>Name</th><th>Room Number</th></tr></thead>";
+	// echo $roomtypes;
+	if($initialcount > 0){
+	    // $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";
+	    $querystring = "SELECT * FROM Client c WHERE NOT EXISTS ((SELECT DISTINCT rtype FROM Roomtype where rtype in (".$roomtypes.")
+	    MINUS (SELECT rmm.rtype FROM Reservation res inner join Room rmm on res.rnum=rmm.rnum where res.ccnum=c.ccnum and stayid is not null)))";
+	    // echo $querystring;
+        $result = DB::getInstance()->executePlainSQL($querystring);
+	echo "<table class='table table-hover'>";
+	echo "<thead><tr><th>Client Name</th><th>Phone No</th></tr></thead>";
 	echo "<tbody>";
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		$number = count($row);
 		echo "<tr>";
-		for($i = 0; $i < $number; $i++)
-			echo "<td>".$row[$i]."</td>";
-	
+		echo "<td>".$row["NAME"]."</td><td>".$row["PNUM"]."</td>";
 		echo "</tr>";
 	}
 	echo "</tbody>";
 	echo "</table>";
-
-}
-
-if (db_conn) {
-  	echo "Successfully connected to Oracle"."<br>";
-	$roomtypes = "";
-	$count = 0;
-
-
-	if(isset($_POST["clientRoomCheckbox1"]))
-		$count++;
-	if(isset($_POST["clientRoomCheckbox2"]))
-		$count++;
-	if(isset($_POST["clientRoomCheckbox3"]))
-		$count++;
-	if(isset($_POST["clientRoomCheckbox4"]))
-		$count++;
-	$initialcount = $count;
-
-	if(isset($_POST["clientRoomCheckbox1"])){
-		$var1 = $_POST["clientRoomCheckbox1"];
-		//$roomtypes = $roomtypes.$var1;
-		$roomtypes = $roomtypes."'SINGLE'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
-	
-	if(isset($_POST["clientRoomCheckbox2"])){
-		$var2 = $_POST["clientRoomCheckbox2"];
-		//$roomtypes = $roomtypes.$var2;
-		$roomtypes = $roomtypes."'DOUBLE'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
-	
-	if(isset($_POST["clientRoomCheckbox3"])){
-		$var3 = $_POST["clientRoomCheckbox3"];
-		//$roomtypes = $roomtypes.$var3;
-		$roomtypes = $roomtypes."'QUEEN'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
-	
-	if(isset($_POST["clientRoomCheckbox4"])){
-		$var4 = $_POST["clientRoomCheckbox4"];
-		//$roomtypes = $roomtypes.$var4;
-		$roomtypes = $roomtypes."'KING'";
-		if($count > 1){
-			$count--;
-			$roomtypes = $roomtypes.",";}
-	}
-
-	echo $roomtypes;
-	if($initialcount > 0){
-	    $querystring = "select * from client where ccNum in (select r.ccNum from stay s, reservation r, room rm where s.stayid = r.stayid and r.rNum = rm.rNum and rm.rType in (".$roomtypes."))";
-        $result = executePlainSQL($querystring);
-	    printResult($result);
 	}
   	OCILogoff($db_conn);
 } else {
-  	$err = OCIError();
-  	echo "Oracle Connect Error " . $err['message'];
+  	echo '<div class="alert alert-danger alert-dismissable">';
+	echo '<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
+	echo '<strong>Oracle Connect Error! </strong>';
+		$e = OCI_Error(); // For OCIParse errors pass the
+		// connection handle
+		echo htmlentities($e['message']);
+	echo "</div>";
 }
 ?>
                         </div>
