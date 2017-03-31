@@ -244,7 +244,7 @@ if ($db_conn) {
 		$minfloor = $var1 * 100 - 1;
 		$maxfloor = ($var1 + 1) * 100;
 //        $result = DB::getInstance()->executePlainSQL("select * from room where rnum >". $minfloor." and rnum<".$maxfloor);
-        $result = DB::getInstance()->executePlainSQL("SELECT r.rNum, rt.rPrice FROM Room r, RoomType rt WHERE r.rType=rt.rType AND rnum >". $minfloor." and rnum<".$maxfloor);
+        $result = DB::getInstance()->executePlainSQL("SELECT r.rNum, rt.rPrice FROM Room r, RoomType rt WHERE r.rType=rt.rType AND rnum >". $minfloor." and rnum<".$maxfloor."order by rnum");
 		DB::getInstance()->printResultDynamic($result, ["Room #", "Room Type Price ($)"]);
 		//echo $floorNoString;
 	}
