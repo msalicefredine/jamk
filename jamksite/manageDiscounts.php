@@ -178,17 +178,13 @@
                             <div class="checkbox">
                                 <label><input name="discount" type="radio" value="count"> Number of Discounts per Manager</label>
                             </div>
-                            <ol class="breadcrumb">
-                                <li class="active">
-                                    Optional: Additional filter to above query
-                                </li>
-                            </ol>
                             <div class="checkbox">
-                                <label><input name="extra" type="radio" value="maximum"> Top manager - maximum </label>
+                                <label><input name="discount" type="radio" value="highestavg"> Highest Average Discount</label>
                             </div>
                             <div class="checkbox">
-                                <label><input name="extra" type="radio" value="minimum"> Bottom manager - minimum </label>
+                                <label><input name="discount" type="radio" value="lowestavg"> Lowest Average Discount</label>
                             </div>
+                           
                             <br>
                             <hr>
                             <div class="form-group" align="right">
@@ -273,50 +269,16 @@ function printResult($result) { //prints results from a select statement
 		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Sum of Discounts</th></tr></thead>";
 	elseif ($var1 == "count")
 		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Number of Discounts</th></tr></thead>";
+	elseif ($var1 == "highestavg")
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Highest Average Discount</th></tr></thead>";
+	else
+		echo "<thead><tr><th>Employee Name</th><th>Employee ID </th><th>Lowest Average Discount</th></tr></thead>";
 	echo "<tbody>";
-	$var1;
-	$value;
-	$extraRow;
-	if(isset($_POST["extra"])){
-		$var1 = $_POST["extra"];
-		if($var1 == "maximum")
-			$value = -1;
-		elseif($var1 == "minimum")
-			$value = PHP_INT_MAX;
-
 
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		/*$number = count($row);
-
-		echo "<tr>";
-		for($i = 0; $i < $number; $i++)
-			echo "<td>".$row[$i]."</td>";
-
-		echo "</tr>";*/
-
-		if($var1 == "maximum"){
-			if($row[2] > $value){
-				$extraRow = $row;
-				$value = $row[2];
-				}
-
-		}
-		elseif($var1 == "minimum"){
-			if($row[2] < $value){
-				$extraRow = $row;
-				$value = $row[2];
-				}
-		}
-
-
+		printRow($row);
 	}
-	printRow($extraRow);
-	}
-	else{
-		while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-			printRow($row);
-		}
-	}
+
 	echo "</tbody>";
 	echo "</table>";
 
@@ -349,11 +311,14 @@ function checkCode(){
 if ($db_conn) {
   	if($_POST["auth"] ){
   		if(checkCode()){
-  			if(isset($_POST["discount"])){
   				$var1 = $_POST["discount"];
-				$result = DB::getInstance()->executePlainSQL("select e.name, d.eid, ".$var1."(d.amount) from employee e, discounts d where e.eid = d.eid group by e.name, d.eid");
+  				if($var1 == "highestavg")
+  					$result = DB::getInstance()->executePlainSQL("select e.name, d.eid, avg(amount) as HighestAverageDiscount from employee e, discounts d where e.eid = d.eid group by e.name, d.eid having avg(amount) = (select max(avg(amount)) from discounts f group by f.eid)");
+  				elseif($var1 == "lowestavg")
+  					$result = DB::getInstance()->executePlainSQL("select e.name, d.eid, avg(amount) as LowestAverageDiscount from employee e, discounts d where e.eid = d.eid group by e.name, d.eid having avg(amount) = (select min(avg(amount)) from discounts f group by f.eid)");
+  				else
+					$result = DB::getInstance()->executePlainSQL("select e.name, d.eid, ".$var1."(d.amount) from employee e, discounts d where e.eid = d.eid group by e.name, d.eid");
 				printResult($result);
-			}
 		}
 		else{
 			 echo "<div id='authError' class='alert alert-danger'>";
